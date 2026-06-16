@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SquareArrowOutUpRight } from "lucide-react";
+import { AgntcyFooter } from "@/components/agntcy-footer";
 
 export const metadata: Metadata = {
   title: "AGNTCY — Building the Internet of Agents",
@@ -44,6 +45,14 @@ const CARDS = [
     title: "Identity",
     body: "Solution to manage and verify the identities of Agents or Tools issued by any organization, ensuring secure and trustworthy interactions.",
   },
+];
+
+const TSC_MEMBERS = [
+  { name: "Cisco", logo: "/agntcy/logos/cisco.png" },
+  { name: "Dell Technologies", logo: "/agntcy/logos/dell.png" },
+  { name: "Google Cloud", logo: "/agntcy/logos/google.png" },
+  { name: "Oracle", logo: "/agntcy/logos/oracle.png" },
+  { name: "Red Hat", logo: "/agntcy/logos/redhat.png" },
 ];
 
 export default function AgntcyPage() {
@@ -168,7 +177,29 @@ export default function AgntcyPage() {
             </article>
           ))}
         </div>
+
+        <section className="mt-16 3xl:mt-24">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#fbaf45] 3xl:text-base">
+            Technical Steering Committee
+          </p>
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 3xl:mt-8 3xl:gap-6">
+            {TSC_MEMBERS.map((member) => (
+              <div
+                key={member.name}
+                className="flex h-20 items-center justify-center rounded-[16px] border border-[#0d274d] bg-[#00142b] px-5 shadow-[0px_4px_30px_#0d274d] transition-shadow duration-300 hover:shadow-[0px_8px_50px_rgba(24,122,220,0.45)] 3xl:h-28 3xl:rounded-[22px] 3xl:px-7"
+              >
+                <img
+                  src={member.logo}
+                  alt={member.name}
+                  loading="lazy"
+                  className="max-h-9 w-auto max-w-full object-contain 3xl:max-h-14"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
+      <AgntcyFooter />
       </div>
     </div>
   );

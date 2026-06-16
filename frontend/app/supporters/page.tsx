@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Quote } from "lucide-react";
+import { AgntcyFooter } from "@/components/agntcy-footer";
 
 export const metadata: Metadata = {
   title: "Supporters — AGNTCY",
@@ -21,6 +22,23 @@ type Testimonial = {
   title: string;
   company: string;
   quote: string;
+};
+
+const COMPANY_LOGOS: Record<string, string> = {
+  Glean: "/agntcy/logos/glean.svg",
+  Traceloop: "/agntcy/logos/traceloop.png",
+  Komodor: "/agntcy/logos/komodor.png",
+  AG2: "/agntcy/logos/ag2.png",
+  Dynamiq: "/agntcy/logos/dynamiq.png",
+  "Haize Labs": "/agntcy/logos/haize-labs.png",
+  "Aviz Networks": "/agntcy/logos/aviz-networks.png",
+  Boomi: "/agntcy/logos/boomi.png",
+  Weaviate: "/agntcy/logos/weaviate.png",
+  CrewAI: "/agntcy/logos/crewai.png",
+  Dagger: "/agntcy/logos/dagger.png",
+  Skyfire: "/agntcy/logos/skyfire.png",
+  Ema: "/agntcy/logos/ema.png",
+  "Yokai Network": "/agntcy/logos/yokai-network.png",
 };
 
 const TESTIMONIALS: Testimonial[] = [
@@ -188,7 +206,9 @@ export default function SupportersPage() {
           </p>
 
           <div className="mt-12 columns-1 gap-5 sm:columns-2 lg:columns-3 3xl:mt-16 3xl:gap-7">
-            {TESTIMONIALS.map((t) => (
+            {TESTIMONIALS.map((t) => {
+              const logo = COMPANY_LOGOS[t.company];
+              return (
               <article
                 key={`${t.name}-${t.company}`}
                 className="group relative mb-5 break-inside-avoid rounded-[20px] border border-[#0d274d] bg-[#00142b] p-6 shadow-[0px_4px_30px_#0d274d] transition-all duration-300 hover:-translate-y-1 hover:border-[#187adc] hover:shadow-[0px_8px_50px_rgba(24,122,220,0.45)] 3xl:mb-7 3xl:rounded-[28px] 3xl:p-8"
@@ -205,7 +225,21 @@ export default function SupportersPage() {
                   {t.quote}
                 </p>
                 <div className="mt-5 border-t border-[#0d274d] pt-4 3xl:mt-7 3xl:pt-5">
-                  <p className="text-sm font-bold text-white 3xl:text-lg">
+                  {logo ? (
+                    <span className="inline-flex h-8 max-w-[160px] items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-2.5 3xl:h-11 3xl:max-w-[220px] 3xl:px-3.5">
+                      <img
+                        src={logo}
+                        alt={`${t.company} logo`}
+                        loading="lazy"
+                        className="h-4 w-auto max-w-full object-contain 3xl:h-6"
+                      />
+                    </span>
+                  ) : (
+                    <span className="inline-flex h-8 items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-3 text-sm font-semibold tracking-tight text-white 3xl:h-11 3xl:text-lg">
+                      {t.company}
+                    </span>
+                  )}
+                  <p className="mt-3 text-sm font-bold text-white 3xl:mt-4 3xl:text-lg">
                     {t.name}
                   </p>
                   <p className="mt-0.5 text-xs text-[#187adc] 3xl:text-base">
@@ -213,9 +247,11 @@ export default function SupportersPage() {
                   </p>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
         </main>
+        <AgntcyFooter />
       </div>
     </div>
   );
