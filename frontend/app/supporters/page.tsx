@@ -11,6 +11,7 @@ import {
 } from "@/components/supporter-logo-wall";
 import { TscLogos } from "@/components/tsc-logos";
 import { SectionTabs } from "@/components/section-tabs";
+import { BackToTop } from "@/components/back-to-top";
 import { withBase } from "@/lib/site";
 import { urlForLogo } from "@/lib/company-urls";
 
@@ -358,6 +359,7 @@ export default function SupportersPage() {
         </main>
         <AgntcyFooter />
       </div>
+      <BackToTop />
     </div>
   );
 }

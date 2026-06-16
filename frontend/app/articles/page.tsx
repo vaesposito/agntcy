@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AgntcyFooter } from "@/components/agntcy-footer";
 import { ArticleGrid, type Article } from "@/components/article-grid";
+import { BackToTop } from "@/components/back-to-top";
 import { withBase } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -233,6 +234,7 @@ export default function ArticlesPage() {
         </main>
         <AgntcyFooter />
       </div>
+      <BackToTop />
     </div>
   );
 }

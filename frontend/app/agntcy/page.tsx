@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SquareArrowOutUpRight } from "lucide-react";
 import { AgntcyFooter } from "@/components/agntcy-footer";
 import { TscLogos } from "@/components/tsc-logos";
+import { BackToTop } from "@/components/back-to-top";
 import { withBase } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -210,6 +211,7 @@ export default function AgntcyPage() {
       </main>
       <AgntcyFooter />
       </div>
+      <BackToTop />
     </div>
   );
 }
