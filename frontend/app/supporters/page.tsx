@@ -283,25 +283,27 @@ export default function SupportersPage() {
               ),
             )}
           </nav>
-          <SectionTabs tabs={SECTION_TABS} />
         </header>
 
         <main className="px-8 pb-20 pt-6 md:px-[90px] md:pt-12 lg:pl-[200px] lg:pr-[150px] 3xl:pl-[260px] 3xl:pr-[200px] 3xl:pt-16 3xl:pb-28">
-          <Link
-            href="/agntcy"
-            className="group inline-flex items-center gap-x-4 gap-y-2"
-          >
-            <img
-              src={withBase("/agntcy/logo.svg")}
-              width={513}
-              height={116}
-              alt="AGNTCY — back to home"
-              className="h-10 w-auto transition-transform duration-200 group-hover:-translate-y-0.5 md:h-12 lg:h-14 3xl:h-20"
-            />
-            <span className="text-xs text-white/70 transition-colors duration-200 group-hover:text-[#fbaf45] md:text-sm 3xl:text-lg">
-              Home
-            </span>
-          </Link>
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+            <Link
+              href="/agntcy"
+              className="group inline-flex items-center gap-x-4 gap-y-2"
+            >
+              <img
+                src={withBase("/agntcy/logo.svg")}
+                width={513}
+                height={116}
+                alt="AGNTCY — back to home"
+                className="h-10 w-auto transition-transform duration-200 group-hover:-translate-y-0.5 md:h-12 lg:h-14 3xl:h-20"
+              />
+              <span className="text-xs text-white/70 transition-colors duration-200 group-hover:text-[#fbaf45] md:text-sm 3xl:text-lg">
+                Home
+              </span>
+            </Link>
+            <SectionTabs tabs={SECTION_TABS} />
+          </div>
 
           <section
             id="supporters"
