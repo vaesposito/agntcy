@@ -49,6 +49,7 @@ const CARDS = [
 export default function AgntcyPage() {
   return (
     <div className="fixed inset-0 overflow-y-auto bg-[#00142b] font-sans text-[#e8e9ea]">
+      <div className="mx-auto w-full max-w-[1512px] 3xl:max-w-[2040px] 4xl:max-w-[2560px]">
       <img
         src="/agntcy/banner-stripes.svg"
         width={1258}
@@ -58,8 +59,8 @@ export default function AgntcyPage() {
         className="block h-auto w-[70%] select-none"
       />
 
-      <header className="flex justify-end px-8 py-6 md:px-[90px] md:py-8 lg:pl-[200px] lg:pr-[150px]">
-        <nav className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm text-white md:gap-x-8 md:text-base">
+      <header className="flex justify-end px-8 py-6 md:px-[90px] md:py-8 lg:pl-[200px] lg:pr-[150px] 3xl:pl-[260px] 3xl:pr-[200px] 3xl:py-12">
+        <nav className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm text-white md:gap-x-8 md:text-base 3xl:gap-x-10 3xl:text-xl">
           {NAV_LINKS.map((link) => (
             <a
               key={link.label}
@@ -72,41 +73,41 @@ export default function AgntcyPage() {
         </nav>
       </header>
 
-      <main className="px-8 pb-20 pt-6 md:px-[90px] md:pt-12 lg:pl-[200px] lg:pr-[150px]">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+      <main className="px-8 pb-20 pt-6 md:px-[90px] md:pt-12 lg:pl-[200px] lg:pr-[150px] 3xl:pl-[260px] 3xl:pr-[200px] 3xl:pt-16 3xl:pb-28">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 3xl:gap-x-8">
           <img
             src="/agntcy/logo.svg"
             width={513}
             height={116}
             alt="AGNTCY"
-            className="h-14 w-auto md:h-16 lg:h-20"
+            className="h-14 w-auto md:h-16 lg:h-20 3xl:h-28"
           />
-          <div className="flex items-center gap-2 text-xs text-white md:text-sm">
+          <div className="flex items-center gap-2 text-xs text-white md:text-sm 3xl:text-lg">
             <span>part of</span>
             <img
               src="/agntcy/linux-foundation.svg"
               width={321}
               height={19}
               alt="Linux Foundation"
-              className="h-4 w-auto md:h-5"
+              className="h-4 w-auto md:h-5 3xl:h-7"
             />
           </div>
         </div>
 
-        <h1 className="mt-8 max-w-4xl text-3xl font-light leading-tight text-[#fbaf45] md:text-4xl lg:text-5xl">
+        <h1 className="mt-8 max-w-4xl text-3xl font-light leading-tight text-[#fbaf45] md:text-4xl lg:text-5xl 3xl:mt-12 3xl:max-w-5xl 3xl:text-6xl">
           Building the Internet of Agents (IoA)
         </h1>
 
-        <p className="mt-5 max-w-3xl text-sm leading-relaxed text-white md:text-base lg:text-lg">
+        <p className="mt-5 max-w-3xl text-sm leading-relaxed text-white md:text-base lg:text-lg 3xl:mt-7 3xl:max-w-4xl 3xl:text-2xl">
           AGNTCY delivers an open-source stack enabling AI agents to collaborate
           across vendors and frameworks through discovery, identity, messaging,
           and observability.
         </p>
 
-        <div className="mt-7 flex flex-wrap gap-3">
+        <div className="mt-7 flex flex-wrap gap-3 3xl:mt-10 3xl:gap-4">
           <a
             href="https://github.com"
-            className="group inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#187adc] bg-[#00142b] px-4 py-2 text-xs text-[#e8e9ea] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#3b91e6] hover:bg-[#187adc]/10 hover:shadow-[0px_8px_24px_rgba(24,122,220,0.35)] md:px-5 md:py-2.5 md:text-sm"
+            className="group inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#187adc] bg-[#00142b] px-4 py-2 text-xs text-[#e8e9ea] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#3b91e6] hover:bg-[#187adc]/10 hover:shadow-[0px_8px_24px_rgba(24,122,220,0.35)] md:px-5 md:py-2.5 md:text-sm 3xl:gap-2 3xl:px-7 3xl:py-3.5 3xl:text-lg"
           >
             Github
             <img
@@ -115,12 +116,12 @@ export default function AgntcyPage() {
               height={21}
               alt=""
               aria-hidden
-              className="h-3.5 w-3.5 transition-transform duration-200 group-hover:scale-110 md:h-4 md:w-4"
+              className="h-3.5 w-3.5 transition-transform duration-200 group-hover:scale-110 md:h-4 md:w-4 3xl:h-5 3xl:w-5"
             />
           </a>
           <a
             href="#"
-            className="group inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#187adc] px-4 py-2 text-xs text-[#e8e9ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2b8ae8] hover:shadow-[0px_8px_24px_rgba(24,122,220,0.5)] md:px-5 md:py-2.5 md:text-sm"
+            className="group inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#187adc] px-4 py-2 text-xs text-[#e8e9ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2b8ae8] hover:shadow-[0px_8px_24px_rgba(24,122,220,0.5)] md:px-5 md:py-2.5 md:text-sm 3xl:gap-2 3xl:px-7 3xl:py-3.5 3xl:text-lg"
           >
             Learn more
             <img
@@ -129,16 +130,16 @@ export default function AgntcyPage() {
               height={18}
               alt=""
               aria-hidden
-              className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 md:h-4 md:w-4"
+              className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 md:h-4 md:w-4 3xl:h-5 3xl:w-5"
             />
           </a>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 3xl:mt-16 3xl:gap-7">
           {CARDS.map((card) => (
             <article
               key={card.title}
-              className="group relative cursor-pointer rounded-[20px] border border-[#0d274d] bg-[#00142b] p-6 text-center shadow-[0px_4px_30px_#0d274d] transition-shadow duration-300 hover:shadow-[0px_8px_50px_rgba(24,122,220,0.45)]"
+              className="group relative cursor-pointer rounded-[20px] border border-[#0d274d] bg-[#00142b] p-6 text-center shadow-[0px_4px_30px_#0d274d] transition-shadow duration-300 hover:shadow-[0px_8px_50px_rgba(24,122,220,0.45)] 3xl:rounded-[28px] 3xl:p-8"
             >
               <span
                 aria-hidden
@@ -146,7 +147,7 @@ export default function AgntcyPage() {
               />
               <SquareArrowOutUpRight
                 aria-hidden
-                className="absolute right-4 top-4 h-4 w-4 text-[#e8e9ea] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                className="absolute right-4 top-4 h-4 w-4 text-[#e8e9ea] opacity-0 transition-opacity duration-300 group-hover:opacity-100 3xl:right-5 3xl:top-5 3xl:h-5 3xl:w-5"
               />
               <div className="flex justify-center">
                 <img
@@ -155,19 +156,20 @@ export default function AgntcyPage() {
                   height={card.iconHeight}
                   alt=""
                   aria-hidden
-                  className="h-6 w-auto"
+                  className="h-6 w-auto 3xl:h-8"
                 />
               </div>
-              <h2 className="mt-4 text-base font-bold text-[#e8e9ea]">
+              <h2 className="mt-4 text-base font-bold text-[#e8e9ea] 3xl:mt-6 3xl:text-xl">
                 {card.title}
               </h2>
-              <p className="mt-2.5 text-xs leading-relaxed text-[#e8e9ea]">
+              <p className="mt-2.5 text-xs leading-relaxed text-[#e8e9ea] 3xl:mt-4 3xl:text-base">
                 {card.body}
               </p>
             </article>
           ))}
         </div>
       </main>
+      </div>
     </div>
   );
 }
