@@ -64,7 +64,7 @@ export default function AgntcyPage() {
             <a
               key={link.label}
               href={link.href}
-              className="transition-opacity hover:opacity-70"
+              className="cursor-pointer bg-[linear-gradient(#fbaf45,#fbaf45)] bg-[length:0%_2px] bg-[position:0_100%] bg-no-repeat pb-1 text-white transition-[color,background-size] duration-200 hover:bg-[length:100%_2px] hover:text-[#fbaf45]"
             >
               {link.label}
             </a>
@@ -106,7 +106,7 @@ export default function AgntcyPage() {
         <div className="mt-7 flex flex-wrap gap-3">
           <a
             href="https://github.com"
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#187adc] bg-[#00142b] px-4 py-2 text-xs text-[#e8e9ea] transition-colors hover:bg-[#0d274d] md:px-5 md:py-2.5 md:text-sm"
+            className="group inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#187adc] bg-[#00142b] px-4 py-2 text-xs text-[#e8e9ea] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#3b91e6] hover:bg-[#187adc]/10 hover:shadow-[0px_8px_24px_rgba(24,122,220,0.35)] md:px-5 md:py-2.5 md:text-sm"
           >
             Github
             <img
@@ -115,12 +115,12 @@ export default function AgntcyPage() {
               height={21}
               alt=""
               aria-hidden
-              className="h-3.5 w-3.5 md:h-4 md:w-4"
+              className="h-3.5 w-3.5 transition-transform duration-200 group-hover:scale-110 md:h-4 md:w-4"
             />
           </a>
           <a
             href="#"
-            className="inline-flex items-center gap-1.5 rounded-full bg-[#187adc] px-4 py-2 text-xs text-[#e8e9ea] transition-colors hover:bg-[#1a6ec2] md:px-5 md:py-2.5 md:text-sm"
+            className="group inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#187adc] px-4 py-2 text-xs text-[#e8e9ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2b8ae8] hover:shadow-[0px_8px_24px_rgba(24,122,220,0.5)] md:px-5 md:py-2.5 md:text-sm"
           >
             Learn more
             <img
@@ -129,7 +129,7 @@ export default function AgntcyPage() {
               height={18}
               alt=""
               aria-hidden
-              className="h-3.5 w-3.5 md:h-4 md:w-4"
+              className="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5 md:h-4 md:w-4"
             />
           </a>
         </div>
