@@ -20,12 +20,14 @@ function CompanyLogo({
   url,
   className,
   wordmarkClassName,
+  imgClassName = "h-4 w-auto max-w-full object-contain 3xl:h-6",
 }: {
   logo?: string;
   company: string;
   url?: string;
   className: string;
   wordmarkClassName: string;
+  imgClassName?: string;
 }) {
   const [broken, setBroken] = useState(false);
   const showWordmark = !logo || broken;
@@ -38,7 +40,7 @@ function CompanyLogo({
       alt={`${company} logo`}
       loading="lazy"
       onError={() => setBroken(true)}
-      className="h-4 w-auto max-w-full object-contain 3xl:h-6"
+      className={imgClassName}
     />
   );
 
@@ -106,8 +108,9 @@ export function TestimonialModalWall({
                 logo={t.logo}
                 company={t.company}
                 url={t.url}
-                className="inline-flex h-8 max-w-[160px] items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-2.5 3xl:h-11 3xl:max-w-[220px] 3xl:px-3.5"
-                wordmarkClassName="inline-flex h-8 items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-3 text-sm font-semibold tracking-tight text-white 3xl:h-11 3xl:text-lg"
+                className="inline-flex h-12 max-w-[220px] items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-3.5 3xl:h-16 3xl:max-w-[300px] 3xl:px-5"
+                wordmarkClassName="inline-flex h-12 items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-4 text-base font-semibold tracking-tight text-white 3xl:h-16 3xl:text-xl"
+                imgClassName="h-7 w-auto max-w-full object-contain 3xl:h-10"
               />
               <p className="mt-3 text-sm font-bold text-white 3xl:mt-4 3xl:text-lg">
                 {t.name}
