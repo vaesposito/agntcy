@@ -1,7 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Quote } from "lucide-react";
 import { AgntcyFooter } from "@/components/agntcy-footer";
+import {
+  TestimonialModalWall,
+  type Testimonial as TestimonialCard,
+} from "@/components/testimonial-modal-wall";
+import {
+  SupporterLogoWall,
+  type Supporter,
+} from "@/components/supporter-logo-wall";
 import { withBase } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -24,6 +31,85 @@ type Testimonial = {
   company: string;
   quote: string;
 };
+
+const SUPPORTERS: Supporter[] = [
+  { name: "Advensis", logo: "/agntcy/logos/advensis.png" },
+  { name: "AG2", logo: "/agntcy/logos/ag2-logo.png" },
+  { name: "AIPlotch", logo: "/agntcy/logos/plotch.png" },
+  { name: "Aisera", logo: "/agntcy/logos/aisera.png" },
+  { name: "Anon", logo: "/agntcy/logos/anon-logo.png" },
+  { name: "AnyWeb", logo: "/agntcy/logos/anyweb.png" },
+  { name: "ArcBlock", logo: "/agntcy/logos/arcblock.svg" },
+  { name: "Arize AI", logo: "/agntcy/logos/arizeai.png" },
+  { name: "Aviz Networks", logo: "/agntcy/logos/aviz.png" },
+  { name: "Beam AI", logo: "/agntcy/logos/beam.png" },
+  { name: "Boomi", logo: "/agntcy/logos/boomi-2.png" },
+  { name: "BrowserBase", logo: "/agntcy/logos/browserbase.png" },
+  { name: "Ciroos", logo: "/agntcy/logos/ciroos.png" },
+  { name: "Comet", logo: "/agntcy/logos/comet.png" },
+  { name: "CrewAI", logo: "/agntcy/logos/crewai-logo.png" },
+  { name: "Dagger", logo: "/agntcy/logos/dagger.png" },
+  { name: "Duo", logo: "/agntcy/logos/duo.svg" },
+  { name: "Dynamiq", logo: "/agntcy/logos/dynamiq-logo.png" },
+  { name: "Ema", logo: "/agntcy/logos/ema.png" },
+  { name: "FabrixAI", logo: "/agntcy/logos/fabrix-ai.png" },
+  { name: "Galileo", logo: "/agntcy/logos/galileo.png" },
+  { name: "Glean", logo: "/agntcy/logos/glean.svg" },
+  { name: "Haize Labs", logo: "/agntcy/logos/haize-labs-white.png" },
+  { name: "HumanSecurity", logo: "/agntcy/logos/human-security.png" },
+  { name: "Hyperbolic", logo: "/agntcy/logos/hyperbolic.png" },
+  { name: "Infinitus", logo: "/agntcy/logos/infinitus.svg" },
+  { name: "Infosys", logo: "/agntcy/logos/infosys.png" },
+  { name: "Kibo", logo: "/agntcy/logos/kibo.svg" },
+  { name: "Komodor", logo: "/agntcy/logos/komodor-logo.png" },
+  { name: "LangChain", logo: "/agntcy/logos/langchain-updated.png" },
+  { name: "Layer", logo: "/agntcy/logos/layerlogo.png" },
+  { name: "Letta", logo: "/agntcy/logos/letta.svg" },
+  { name: "Lightning AI", logo: "/agntcy/logos/lightningai.png" },
+  { name: "LlamaIndex", logo: "/agntcy/logos/llamaindex.png" },
+  { name: "Lleverage", logo: "/agntcy/logos/lleverage.png" },
+  { name: "Lobby", logo: "/agntcy/logos/lobby.png" },
+  { name: "Meet Lloyd", logo: "/agntcy/logos/meetloyd.png" },
+  { name: "Mem0", logo: "/agntcy/logos/mem0.png" },
+  { name: "MongoDB", logo: "/agntcy/logos/mongodb-logo.png" },
+  { name: "Motleycrew", logo: "/agntcy/logos/motleycrew.png" },
+  { name: "Mozilla", logo: "/agntcy/logos/mozilla.png" },
+  { name: "Naptha AI", logo: "/agntcy/logos/naptha-ai.png" },
+  { name: "Netcloud", logo: "/agntcy/logos/netcloud.svg" },
+  { name: "Nurix AI", logo: "/agntcy/logos/nurix-ai.svg" },
+  { name: "Onetrust", logo: "/agntcy/logos/onetrust.png" },
+  { name: "Opaque", logo: "/agntcy/logos/opaque.png" },
+  { name: "Orium", logo: "/agntcy/logos/orium.png" },
+  { name: "Ory", logo: "/agntcy/logos/ory.png" },
+  { name: "Pattern Agentic AI", logo: "/agntcy/logos/patternagenticai.png" },
+  { name: "Pensar", logo: "/agntcy/logos/pensar.png" },
+  { name: "Permit", logo: "/agntcy/logos/permit-logo-variant3.png" },
+  { name: "Persistent", logo: "/agntcy/logos/persistent.png" },
+  { name: "Presidio", logo: "/agntcy/logos/presidio.png" },
+  { name: "PydanticAI", logo: "/agntcy/logos/pydantic.png" },
+  { name: "Redis", logo: "/agntcy/logos/redis.png" },
+  { name: "SciEncephalon AI", logo: "/agntcy/logos/sciencephalonai.png" },
+  { name: "Skreens", logo: "/agntcy/logos/skreens.svg" },
+  { name: "Skyfire", logo: "/agntcy/logos/skyfire.png" },
+  { name: "SmythOS", logo: "/agntcy/logos/smythos.png" },
+  { name: "Snaplogic", logo: "/agntcy/logos/snaplogic.png" },
+  { name: "Softserve", logo: "/agntcy/logos/softserve.svg" },
+  { name: "Superbo", logo: "/agntcy/logos/superbo.png" },
+  { name: "Supertab", logo: "/agntcy/logos/supertab.png" },
+  { name: "Swirl AI", logo: "/agntcy/logos/swirl-ai.png" },
+  { name: "Traceloop", logo: "/agntcy/logos/traceloop.png" },
+  { name: "Tykio", logo: "/agntcy/logos/tykio.png" },
+  { name: "Ushur", logo: "/agntcy/logos/ushur.svg" },
+  { name: "Valtech", logo: "/agntcy/logos/valtech.png" },
+  { name: "Vijil", logo: "/agntcy/logos/vijil.png" },
+  { name: "VoAgents", logo: "/agntcy/logos/voagents.png" },
+  { name: "VoltAgent", logo: "/agntcy/logos/voltagent.png" },
+  { name: "Wayfound", logo: "/agntcy/logos/wayfound.png" },
+  { name: "Weaviate", logo: "/agntcy/logos/weaviate-wh.png" },
+  { name: "Yallma3", logo: "/agntcy/logos/yallma3.png" },
+  { name: "Yokai", logo: "/agntcy/logos/yokai.png" },
+  { name: "Zep", logo: "/agntcy/logos/zep.png" },
+];
 
 const COMPANY_LOGOS: Record<string, string> = {
   Glean: "/agntcy/logos/glean.svg",
@@ -143,6 +229,11 @@ const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
+const TESTIMONIAL_CARDS: TestimonialCard[] = TESTIMONIALS.map((t) => ({
+  ...t,
+  logo: COMPANY_LOGOS[t.company],
+}));
+
 export default function SupportersPage() {
   return (
     <div className="fixed inset-0 overflow-y-auto bg-[#00142b] font-sans text-[#e8e9ea]">
@@ -198,59 +289,29 @@ export default function SupportersPage() {
           </Link>
 
           <h1 className="mt-10 max-w-4xl text-3xl font-light leading-tight text-[#fbaf45] md:text-4xl lg:text-5xl 3xl:mt-14 3xl:max-w-5xl 3xl:text-6xl">
-            They say about us
+            Our Supporters
           </h1>
 
           <p className="mt-5 max-w-3xl text-sm leading-relaxed text-white md:text-base lg:text-lg 3xl:mt-7 3xl:max-w-4xl 3xl:text-2xl">
-            What our partners and supporters say about AGNTCY and the Internet of
-            Agents.
+            The open, interoperable Internet of Agents isn&apos;t a nice to have,
+            it&apos;s a must have. These {SUPPORTERS.length} organizations stand
+            with AGNTCY — building bridges, not walls.
           </p>
 
-          <div className="mt-12 columns-1 gap-5 sm:columns-2 lg:columns-3 3xl:mt-16 3xl:gap-7">
-            {TESTIMONIALS.map((t) => {
-              const logo = COMPANY_LOGOS[t.company];
-              return (
-              <article
-                key={`${t.name}-${t.company}`}
-                className="group relative mb-5 break-inside-avoid rounded-[20px] border border-[#0d274d] bg-[#00142b] p-6 shadow-[0px_4px_30px_#0d274d] transition-all duration-300 hover:-translate-y-1 hover:border-[#187adc] hover:shadow-[0px_8px_50px_rgba(24,122,220,0.45)] 3xl:mb-7 3xl:rounded-[28px] 3xl:p-8"
-              >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 rounded-[20px] p-px opacity-0 transition-opacity duration-300 [background:linear-gradient(135deg,#187adc,#5fd3ff)] [-webkit-mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] [-webkit-mask-composite:xor] [mask-composite:exclude] group-hover:opacity-100 3xl:rounded-[28px]"
-                />
-                <Quote
-                  aria-hidden
-                  className="h-6 w-6 text-[#fbaf45] 3xl:h-8 3xl:w-8"
-                />
-                <p className="mt-4 text-sm leading-relaxed text-[#e8e9ea] 3xl:mt-6 3xl:text-lg">
-                  {t.quote}
-                </p>
-                <div className="mt-5 border-t border-[#0d274d] pt-4 3xl:mt-7 3xl:pt-5">
-                  {logo ? (
-                    <span className="inline-flex h-8 max-w-[160px] items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-2.5 3xl:h-11 3xl:max-w-[220px] 3xl:px-3.5">
-                      <img
-                        src={withBase(logo)}
-                        alt={`${t.company} logo`}
-                        loading="lazy"
-                        className="h-4 w-auto max-w-full object-contain 3xl:h-6"
-                      />
-                    </span>
-                  ) : (
-                    <span className="inline-flex h-8 items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-3 text-sm font-semibold tracking-tight text-white 3xl:h-11 3xl:text-lg">
-                      {t.company}
-                    </span>
-                  )}
-                  <p className="mt-3 text-sm font-bold text-white 3xl:mt-4 3xl:text-lg">
-                    {t.name}
-                  </p>
-                  <p className="mt-0.5 text-xs text-[#187adc] 3xl:text-base">
-                    {t.title}, {t.company}
-                  </p>
-                </div>
-              </article>
-              );
-            })}
-          </div>
+          <SupporterLogoWall supporters={SUPPORTERS} />
+
+          <section className="mt-20 3xl:mt-28">
+            <h2 className="max-w-4xl text-3xl font-light leading-tight text-[#fbaf45] md:text-4xl lg:text-5xl 3xl:max-w-5xl 3xl:text-6xl">
+              They say about us
+            </h2>
+
+            <p className="mt-5 max-w-3xl text-sm leading-relaxed text-white md:text-base lg:text-lg 3xl:mt-7 3xl:max-w-4xl 3xl:text-2xl">
+              What our partners and supporters say about AGNTCY and the Internet
+              of Agents. Select a card to read the full quote.
+            </p>
+
+            <TestimonialModalWall testimonials={TESTIMONIAL_CARDS} />
+          </section>
         </main>
         <AgntcyFooter />
       </div>
