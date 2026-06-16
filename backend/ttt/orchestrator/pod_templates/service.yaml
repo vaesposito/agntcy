@@ -1,0 +1,20 @@
+# ClusterIP service for DNS-based routing to a per-project agent pod.
+# Name, namespace, and selector labels are injected by KubernetesOrchestrator.
+apiVersion: v1
+kind: Service
+metadata:
+  name: ""
+  namespace: ""
+  labels:
+    ttt.role: "agent"
+spec:
+  type: ClusterIP
+  selector:
+    ttt.role: "agent"
+    ttt.project_id: ""
+    ttt.agent_role: ""
+  ports:
+    - name: http
+      port: 8766
+      targetPort: 8766
+      protocol: TCP

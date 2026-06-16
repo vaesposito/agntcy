@@ -1,0 +1,16 @@
+# PVC template for per-project wiki and sessions volumes.
+# Name, namespace, storageClassName, and storage size are injected by
+# KubernetesOrchestrator._build_pvc_spec().
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ""
+  namespace: ""
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

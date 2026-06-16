@@ -1,0 +1,80 @@
+name: ttt-project
+
+services:
+  backend:
+    # Pull from GHCR by default. Use `docker compose build` to build locally.
+    image: ghcr.io/cisco-eti/tiny-teams-with-tokens-backend:${TTT_IMAGE_TAG:-latest}
+    build:
+      context: ../..
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8765:8765"
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_AUTH_TOKEN: ${ANTHROPIC_AUTH_TOKEN:-}
+      ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      GITHUB_REDIRECT_URI: ${GITHUB_REDIRECT_URI:-http://localhost:3000/apps/ttt/oauth/github/callback}
+      CONFLUENCE_BASE_URL: ${CONFLUENCE_BASE_URL:-}
+      CONFLUENCE_USER: ${CONFLUENCE_USER:-}
+      CONFLUENCE_TOKEN: ${CONFLUENCE_TOKEN:-}
+      CONFLUENCE_CLIENT_SECRET: ${CONFLUENCE_CLIENT_SECRET:-}
+      CONFLUENCE_REDIRECT_URI: ${CONFLUENCE_REDIRECT_URI:-http://localhost:3000/apps/ttt/oauth/confluence/callback}
+      WEBEX_TOKEN: ${WEBEX_TOKEN:-}
+      WEBEX_CLIENT_SECRET: ${WEBEX_CLIENT_SECRET:-}
+      WEBEX_REDIRECT_URI: ${WEBEX_REDIRECT_URI:-http://localhost:3000/apps/ttt/oauth/webex/callback}
+      CAIPE_PROXY: ${CAIPE_PROXY:-false}
+      TTT_DEV_USER_EMAIL: ${TTT_DEV_USER_EMAIL:-dev@local}
+      TTT_DEV_USER_NAME: ${TTT_DEV_USER_NAME:-Dev User}
+      TTT_ORCHESTRATOR: docker
+      TTT_BACKEND_URL: http://backend:8765
+      TTT_AGENT_IMAGE: ttt-agent:local
+      TTT_WIKI_DIR: /data/wiki
+      LOG_LEVEL: ${LOG_LEVEL:-DEBUG}
+    group_add:
+      - 0 # Give access to docker socket owned by root:root
+    volumes:
+      - ../../data:/data
+      # Mount the docker socket so DockerOrchestrator can manage agent
+      # containers from inside the backend. Only used when
+      # TTT_ORCHESTRATOR=docker; ignored otherwise. Note this is a bad
+      # way to achieve this in production but fine for local dev and testing.
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  frontend:
+    image: ghcr.io/cisco-eti/tiny-teams-with-tokens-frontend:${TTT_IMAGE_TAG:-latest}
+    build:
+      context: ../..
+      dockerfile: frontend/Dockerfile
+    environment:
+      BASE_PATH: /apps/ttt
+      CAIPE_PROXY: ${CAIPE_PROXY:-false}
+      TTT_API_URL: "http://backend:8765"
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/apps/ttt/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # Build-only: this service exists so `docker compose build ttt-agent`
+  # produces the `ttt-agent:local` image the DockerOrchestrator runs
+  # per-project at runtime. It is never `up`'d. Profile `build-only`
+  # excludes it from `docker compose up`.
+  ttt-agent:
+    profiles: ["build-only"]
+    image: ghcr.io/cisco-eti/tiny-teams-with-tokens-agent:${TTT_IMAGE_TAG:-latest}
+    build:
+      context: ../..
+      dockerfile: backend/Dockerfile.agent
+      target: development
+
+networks:
+  default:
+    name: ttt-net

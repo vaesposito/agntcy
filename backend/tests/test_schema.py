@@ -1,0 +1,194 @@
+from ttt.reports import schema
+
+
+def test_default_pages_have_required_kinds() -> None:
+    paths = {p.path for p in schema.DEFAULT_PAGES}
+    # Top-level cross-cutting pages — per-source detail lives under
+    # `repos/<slug>/...` etc., materialized by expand_template.
+    assert paths == {
+        "charter.md",
+        "objectives.md",
+        "roadmap.md",
+        "overview.md",
+        "architecture.md",
+        "marketing.md",
+        "conversations.md",
+        "standup.md",
+        "memory.md",
+    }
+    assert set(schema.default_stable_paths()) == {
+        "charter.md",
+        "objectives.md",
+        "roadmap.md",
+    }
+    assert set(schema.default_report_paths()) == {"standup.md"}
+    assert set(schema.default_hidden_paths()) == {"memory.md"}
+
+
+def test_stable_seed_templates() -> None:
+    templates = schema.stable_seed_templates()
+    # Every stable seed page has a founding template; dynamic pages don't.
+    assert set(templates) == {"charter.md", "objectives.md", "roadmap.md"}
+    for body in templates.values():
+        assert body.startswith("---\n")  # frontmatter present
+
+
+def test_repo_template_expands_under_prefix() -> None:
+    expanded = schema.expand_template("repos/mycelium", schema.REPO_TEMPLATE)
+    paths = {s.path for s in expanded}
+    assert "repos/mycelium/overview.md" in paths
+    assert "repos/mycelium/team.md" in paths
+    assert "repos/mycelium/conversations.md" in paths
+    # Top-level overview is unchanged.
+    assert "overview.md" not in paths
+
+
+def test_webex_template_expands_with_minimal_pages() -> None:
+    expanded = schema.expand_template(
+        "webex/ioc-mycelium-sre", schema.WEBEX_TEMPLATE
+    )
+    paths = {s.path for s in expanded}
+    assert paths == {
+        "webex/ioc-mycelium-sre/overview.md",
+        "webex/ioc-mycelium-sre/activity.md",
+    }
+
+
+def test_build_tree_excludes_surface_pages() -> None:
+    pages = {
+        "standup.md": "---\ntitle: Standup\nkind: report\norder: -10\n---\nbody",
+        "overview.md": "---\ntitle: Overview\nkind: stable\norder: 0\n---\nbody",
+    }
+    tree = schema.build_tree(pages)
+    assert "standup.md" not in {n.path for n in tree}, "standup should not appear in sidebar"
+
+
+def test_build_tree_includes_hidden_pages_with_kind_marker() -> None:
+    """Hidden pages stay in the tree response — the frontend filters them
+    behind a cmd-shift-. style toggle. They're flagged via node.kind so the
+    UI can distinguish."""
+    pages = {
+        "memory.md": "---\ntitle: Memory\nkind: hidden\norder: 0\n---\nsecret notes",
+        "overview.md": "---\ntitle: Overview\nkind: stable\norder: 0\n---\nbody",
+    }
+    tree = schema.build_tree(pages)
+    by_path = {n.path: n for n in tree}
+    assert "memory.md" in by_path
+    assert by_path["memory.md"].kind == "hidden"
+    assert "overview.md" in by_path
+
+
+def test_kinds_from_pages_reads_frontmatter() -> None:
+    pages = {
+        "overview.md": "---\nkind: stable\n---\nbody",
+        "custom.md": "---\nkind: dynamic\n---\nbody",
+        "memory.md": "---\nkind: hidden\n---\nbody",
+        "loose.md": "no frontmatter",  # defaults to stable
+    }
+    kinds = schema.kinds_from_pages(pages)
+    assert kinds["overview.md"] == "stable"
+    assert kinds["custom.md"] == "dynamic"
+    assert kinds["memory.md"] == "hidden"
+    assert kinds["loose.md"] == "stable"
+
+
+def test_stable_paths_in_uses_frontmatter_not_path() -> None:
+    pages = {
+        "overview.md": "---\nkind: stable\n---\nbody",
+        # Custom page not in DEFAULT_PAGES but flagged stable should be preserved.
+        "roadmap.md": "---\nkind: stable\n---\nbody",
+        "product.md": "---\nkind: dynamic\n---\nbody",
+        "memory.md": "---\nkind: hidden\n---\nbody",
+    }
+    preserve = set(schema.stable_paths_in(pages))
+    assert preserve == {"overview.md", "roadmap.md", "memory.md"}
+
+
+def test_validate_pages_returns_missing() -> None:
+    pages = {"overview.md": "x", "product.md": "y"}
+    missing = schema.validate_pages(pages)
+    assert "architecture.md" in missing
+    assert "marketing.md" in missing
+    assert "conversations.md" in missing
+    assert "memory.md" in missing
+    assert "overview.md" not in missing
+
+
+def test_frontmatter_roundtrip() -> None:
+    spec = schema.SPEC_BY_PATH["overview.md"]
+    page = schema.page_with_frontmatter(spec, "## Roadmap\n\nQ3 milestones.\n")
+    fm, body = schema.parse_frontmatter(page)
+    assert fm["title"] == "Overview"
+    assert fm["kind"] == "dynamic"
+    assert fm["order"] == 0
+    assert "Q3 milestones" in body
+
+
+def test_stable_seed_page_has_frontmatter_and_sections() -> None:
+    page = schema.stable_seed_page("charter.md")
+    assert page is not None
+    fm, body = schema.parse_frontmatter(page)
+    assert fm["kind"] == "stable"
+    # The two gems carried over from the design discussion.
+    assert "## Out of scope" in body
+    assert "## Confidence on key bets" in body
+    assert schema.stable_seed_page("overview.md") is None  # dynamic, no template
+
+
+def test_build_tree_handles_nesting() -> None:
+    pages = {
+        "overview.md": schema.page_with_frontmatter(schema.SPEC_BY_PATH["overview.md"], "x"),
+        "architecture.md": schema.page_with_frontmatter(
+            schema.SPEC_BY_PATH["architecture.md"], "x"
+        ),
+        "architecture/design.md": "---\ntitle: Design\nkind: stable\norder: 0\n---\nbody",
+    }
+    tree = schema.build_tree(pages)
+    paths_at_root = [n.path for n in tree]
+    assert "overview.md" in paths_at_root
+    assert "architecture.md" in paths_at_root
+    arch = next(n for n in tree if n.path == "architecture.md")
+    assert any(c.path == "architecture/design.md" for c in arch.children)
+
+
+def test_build_tree_handles_per_repo_subtree_with_real_anchor() -> None:
+    """Per-source subtrees with a real `<dir>.md` anchor: the anchor lives
+    inside a synthetic `repos` folder header (since `repos.md` doesn't
+    exist), and its children nest under it as usual."""
+    pages = {
+        "repos/mycelium.md": "---\ntitle: mycelium\nkind: dynamic\norder: 0\n---\nbody",
+        "repos/mycelium/overview.md": (
+            "---\ntitle: Overview\nkind: dynamic\norder: 0\n---\nbody"
+        ),
+    }
+    tree = schema.build_tree(pages)
+    by_path = {n.path: n for n in tree}
+    assert "repos" in by_path, "synthetic folder header missing"
+    folder = by_path["repos"]
+    assert folder.kind == "folder"
+    anchor = next(c for c in folder.children if c.path == "repos/mycelium.md")
+    assert any(c.path == "repos/mycelium/overview.md" for c in anchor.children)
+
+
+def test_build_tree_synthesizes_folder_for_orphan_subtree() -> None:
+    """When per-repo pages exist but no `repos/<slug>.md` anchor was written,
+    a synthetic folder node groups them in the sidebar instead of leaving
+    them as flat root orphans."""
+    pages = {
+        "overview.md": "---\ntitle: Overview\nkind: dynamic\norder: 0\n---\nbody",
+        "repos/mycelium/overview.md": "---\ntitle: Overview\nkind: dynamic\norder: 0\n---\nbody",
+        "repos/mycelium/team.md": "---\ntitle: Team\nkind: dynamic\norder: 1\n---\nbody",
+    }
+    tree = schema.build_tree(pages)
+    by_path = {n.path: n for n in tree}
+    assert "overview.md" in by_path
+    assert "repos" in by_path
+    repos_folder = by_path["repos"]
+    assert repos_folder.kind == "folder"
+    # `repos.md` doesn't exist, so children of `repos/mycelium/...` need a
+    # `repos/mycelium` synthetic folder under the `repos` folder.
+    mycelium_folder = next(c for c in repos_folder.children if c.path == "repos/mycelium")
+    assert mycelium_folder.kind == "folder"
+    child_paths = {c.path for c in mycelium_folder.children}
+    assert "repos/mycelium/overview.md" in child_paths
+    assert "repos/mycelium/team.md" in child_paths

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "llm-wiki.fullname" . }}-frontend-config
+  labels:
+    {{- include "llm-wiki.labels" . | nindent 4 }}
+data:
+  {{- range $k, $v := .Values.frontendConfig }}
+  {{- if and $v (ne $k "TTT_API_URL") }}
+  {{ $k }}: {{ $v | quote }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.frontendConfig.TTT_API_URL }}
+  TTT_API_URL: {{ .Values.frontendConfig.TTT_API_URL | quote }}
+  {{- else }}
+  TTT_API_URL: {{ include "llm-wiki.backendUrl" . | quote }}
+  {{- end }}

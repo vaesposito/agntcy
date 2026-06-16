@@ -1,0 +1,247 @@
+"""Sqlite-backed page store.
+
+Wiki pages live in the `pagerevision` table. Each save inserts a new row;
+reading a page is `latest row by created_at` for `(project_id, path)`. A
+filesystem cache at `data/wiki/<project_id>/<path>` mirrors the current
+state so the chat agent's Read/Edit/Write/Glob tools can operate on real
+files. Sqlite is the source of truth; the filesystem is regenerable.
+"""
+
+from __future__ import annotations
+
+import shutil
+from datetime import datetime, timezone
+from pathlib import Path
+from uuid import UUID
+
+from sqlmodel import col, select
+from sqlmodel.ext.asyncio.session import AsyncSession
+
+from ttt.config import settings
+from ttt.db import engine
+from ttt.models import PageRevision
+
+
+def _wiki_root() -> Path:
+    return settings.ttt_wiki_dir
+
+
+def init_store() -> None:
+    """Idempotent: ensure the wiki cache directory exists."""
+    print(f"Wiki root parent ({_wiki_root().parent}) owner: {_wiki_root().parent.owner()}, permissions: {_wiki_root().parent.stat().st_mode:o}")
+    _wiki_root().mkdir(parents=True, exist_ok=True)
+
+
+def _project_dir(project_id: UUID) -> Path:
+    d = _wiki_root() / str(project_id)
+    d.mkdir(mode=0o777, parents=True, exist_ok=True)
+    return d
+
+
+def _safe_page_path(page_path: str) -> str:
+    """Reject path traversal; require a `.md` suffix; normalize separators."""
+    if not page_path or page_path.startswith("/") or page_path.endswith("/"):
+        raise ValueError(f"invalid page path: {page_path!r}")
+    parts = page_path.split("/")
+    if any(p in {"", ".", ".."} for p in parts):
+        raise ValueError(f"invalid page path component: {page_path!r}")
+    if not page_path.endswith(".md"):
+        raise ValueError(f"page path must end with .md: {page_path!r}")
+    return page_path
+
+
+def _mirror_to_disk(project_id: UUID, page_path: str, markdown: str) -> None:
+    target = _project_dir(project_id) / page_path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(markdown)
+
+
+def _utcnow() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+async def write_pages(
+    project_id: UUID,
+    pages: dict[str, str],
+    *,
+    message: str,
+    author: str = "ttt",
+    report_id: UUID | None = None,
+) -> None:
+    """Write multiple pages: one PageRevision row per page, all with the same
+    timestamp + message. Mirrors to disk so the chat agent can Read them."""
+    now = _utcnow()
+    async with AsyncSession(engine, expire_on_commit=False) as session:
+        for page_path, md in pages.items():
+            safe = _safe_page_path(page_path)
+            session.add(
+                PageRevision(
+                    project_id=project_id,
+                    path=safe,
+                    markdown=md,
+                    author=author,
+                    message=message,
+                    created_at=now,
+                    report_id=report_id,
+                )
+            )
+            _mirror_to_disk(project_id, safe, md)
+        await session.commit()
+
+
+async def write_page(
+    project_id: UUID,
+    page_path: str,
+    markdown: str,
+    *,
+    message: str,
+    author: str = "ttt",
+    report_id: UUID | None = None,
+) -> None:
+    """Single-page write."""
+    await write_pages(
+        project_id,
+        {page_path: markdown},
+        message=message,
+        author=author,
+        report_id=report_id,
+    )
+
+
+async def read_page(project_id: UUID, page_path: str) -> str:
+    """Latest revision of a single page. Raises LookupError if missing or
+    if the latest revision is a tombstone (deleted)."""
+    safe = _safe_page_path(page_path)
+    async with AsyncSession(engine, expire_on_commit=False) as session:
+        rev = (
+            await session.exec(
+                select(PageRevision)
+                .where(PageRevision.project_id == project_id, PageRevision.path == safe)
+                .order_by(col(PageRevision.created_at).desc(), col(PageRevision.id).desc())
+            )
+        ).first()
+    if not rev or rev.deleted:
+        raise LookupError(f"page not found: {page_path}")
+    return rev.markdown
+
+
+async def list_pages(project_id: UUID) -> dict[str, str]:
+    """Return the current state: for each path, the latest revision. Paths
+    whose latest revision is a tombstone are skipped."""
+    async with AsyncSession(engine, expire_on_commit=False) as session:
+        rows = (
+            await session.exec(
+                select(PageRevision)
+                .where(PageRevision.project_id == project_id)
+                .order_by(col(PageRevision.path), col(PageRevision.created_at).desc(), col(PageRevision.id).desc())
+            )
+        ).all()
+    out: dict[str, str] = {}
+    for r in rows:
+        if r.path in out:
+            continue
+        if r.deleted:
+            # Tombstone wins; remember so a later revision (older row) doesn't resurrect.
+            out[r.path] = ""
+        else:
+            out[r.path] = r.markdown
+    return {p: md for p, md in out.items() if md != ""}
+
+
+async def delete_page(
+    project_id: UUID,
+    page_path: str,
+    *,
+    author: str = "ttt",
+    message: str = "",
+) -> None:
+    """Tombstone the page — insert a deleted=True PageRevision so reads skip
+    it. History rows remain. Idempotent: deleting an already-deleted page is a
+    no-op-equivalent (just adds another tombstone row)."""
+    safe = _safe_page_path(page_path)
+    now = _utcnow()
+    async with AsyncSession(engine, expire_on_commit=False) as session:
+        session.add(
+            PageRevision(
+                project_id=project_id,
+                path=safe,
+                markdown="",
+                author=author,
+                message=message or f"deleted {safe}",
+                created_at=now,
+                deleted=True,
+            )
+        )
+        await session.commit()
+    # Remove the FS mirror so the chat agent's Glob/Read doesn't see a stale file.
+    target = _project_dir(project_id) / safe
+    if target.exists():
+        target.unlink()
+
+
+async def page_history(project_id: UUID, page_path: str) -> list[PageRevision]:
+    """All revisions of a single page, newest first. For #1 history viewer."""
+    safe = _safe_page_path(page_path)
+    async with AsyncSession(engine, expire_on_commit=False) as session:
+        return list(
+            (
+                await session.exec(
+                    select(PageRevision)
+                    .where(PageRevision.project_id == project_id, PageRevision.path == safe)
+                    .order_by(col(PageRevision.created_at).desc(), col(PageRevision.id).desc())
+                )
+            ).all()
+        )
+
+
+async def sync_to_disk(project_id: UUID) -> None:
+    """Rebuild the filesystem cache from sqlite. Useful if the cache is wiped
+    or if a new chat session needs to be sure the FS is current."""
+    pages = await list_pages(project_id)
+    pdir = _project_dir(project_id)
+    if pdir.exists():
+        shutil.rmtree(pdir)
+    pdir.mkdir(mode=0o777, parents=True, exist_ok=True)
+    for path, md in pages.items():
+        _mirror_to_disk(project_id, path, md)
+
+
+async def reconcile_from_disk(
+    project_id: UUID,
+    *,
+    author: str,
+    message: str,
+    report_id: UUID | None = None,
+) -> list[str]:
+    """FS-cache → sqlite reconcile. Walks `data/wiki/<project_id>/`, and for
+    every `.md` file whose contents differ from the latest pagerevision (or
+    has no revision at all), writes a new revision. Returns the list of page
+    paths reconciled — empty when the FS and sqlite are already in sync.
+
+    Use as a safety net at the end of an ingest in case a tool wrote to disk
+    without going through `write_page` (which is the single supported write
+    path; this function exists to recover from drift, not to encourage it).
+    """
+    pdir = _project_dir(project_id)
+    if not pdir.exists():
+        return []
+    current = await list_pages(project_id)
+    reconciled: list[str] = []
+    for fp in sorted(pdir.rglob("*.md")):
+        rel = fp.relative_to(pdir).as_posix()
+        try:
+            disk = fp.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        if current.get(rel) == disk:
+            continue
+        await write_page(
+            project_id,
+            rel,
+            disk,
+            message=f"{message}: {rel}",
+            author=author,
+            report_id=report_id,
+        )
+        reconciled.append(rel)
+    return reconciled

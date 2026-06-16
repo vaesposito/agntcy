@@ -1,0 +1,38 @@
+{{- if .Values.postgres.enabled }}
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: {{ include "llm-wiki.postgresCluster" . }}
+  labels:
+    {{- include "llm-wiki.labels" . | nindent 4 }}
+spec:
+  teamId: {{ .Values.postgres.teamId | quote }}
+
+  volume:
+    size: {{ .Values.postgres.storageSize | quote }}
+    {{- if .Values.postgres.storageClass }}
+    storageClass: {{ .Values.postgres.storageClass | quote }}
+    {{- end }}
+
+  numberOfInstances: {{ .Values.postgres.instances }}
+
+  users:
+    {{ .Values.postgres.user }}:
+      - superuser
+      - createdb
+
+  databases:
+    {{ .Values.postgres.database }}: {{ .Values.postgres.user }}
+
+  # uuid-ossp replaces the postgres-init/init.sql from the docker-compose setup.
+  preparedDatabases:
+    {{ .Values.postgres.database }}:
+      extensions:
+        uuid-ossp: public
+
+  postgresql:
+    version: {{ .Values.postgres.version | quote }}
+
+  resources:
+    {{- toYaml .Values.postgres.resources | nindent 4 }}
+{{- end }}

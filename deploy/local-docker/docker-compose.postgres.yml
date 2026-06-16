@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ttt
+      POSTGRES_PASSWORD: ttt
+      POSTGRES_DB: ${TTT_POSTGRES_DB:-ttt}
+    volumes:
+      - ttt-pg-data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ttt -d ${TTT_POSTGRES_DB:-ttt}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    environment:
+      TTT_DATABASE_URL: postgresql+asyncpg://ttt:ttt@postgres:5432/${TTT_POSTGRES_DB:-ttt}
+      TTT_POSTGRES_DB: ${TTT_POSTGRES_DB:-ttt}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  ttt-pg-data:

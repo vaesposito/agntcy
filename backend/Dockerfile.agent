@@ -1,0 +1,75 @@
+# ttt-agent — per-project Claude Agent SDK loop, exposed over HTTP/SSE.
+#
+# Smaller surface than the backend image: only `ttt.agent`, the orchestrator
+# contract, the prompt loader, and `ttt.reports.schema` (pure data helpers).
+# No FastAPI routes from `ttt.api`, no sqlite/SQLModel beyond what pydantic
+# imports, no OAuth services.
+#
+# The image bakes nothing project-specific. The orchestrator (DockerOrchestrator
+# locally; the host's controller in production) injects project state at
+# runtime via env + a `/project` bind-mount of the wiki dir.
+
+FROM artifactory.devhub-cloud.cisco.com/sto-cg-docker/python:3.14-dev AS builder
+WORKDIR /app
+
+# The bundled Claude Code CLI writes config/state under $HOME on its
+# `initialize` handshake. The hardened base image leaves HOME=/ which is
+# read-only for the unprivileged runtime uid — the CLI then hangs and the
+# SDK's `initialize` control request times out. Give uid 1001 a writable
+# home so the handshake completes.
+USER root
+RUN mkdir -p /home/agent/ && chown -R nonroot:nonroot /home/agent
+USER nonroot
+
+# Resolve all base deps via the same lockfile the backend uses. We could
+# split a `backend-only` group out of pyproject so the agent image excludes
+# FastAPI etc., but keeping a single lock simplifies CI for now and the
+# extra weight is tens of MB. Worth revisiting if the agent image is on a
+# resource-tight K8s budget.
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-install-project --no-dev
+
+# Copy only the modules the agent container needs. Anything not listed
+# here is left out of the image — the agent CANNOT import `ttt.api`,
+# `ttt.services`, `ttt.models`, `ttt.db`, `ttt.pipeline`, `ttt.chat`,
+# `ttt.cli`, or `ttt.reports.repo` because those files aren't here.
+COPY backend/ttt/__init__.py ./ttt/
+COPY backend/ttt/agent ./ttt/agent
+COPY backend/ttt/orchestrator/__init__.py backend/ttt/orchestrator/contract.py ./ttt/orchestrator/
+COPY backend/ttt/orchestrator/base.py ./ttt/orchestrator/
+COPY backend/ttt/prompts ./ttt/prompts
+COPY backend/ttt/reports/__init__.py backend/ttt/reports/schema.py ./ttt/reports/
+COPY backend/ttt/config.py ./ttt/
+
+FROM artifactory.devhub-cloud.cisco.com/sto-cg-docker/python:3.14 AS production
+WORKDIR /app
+
+ENV PYTHONPATH="/app/.venv/lib/python3.14/site-packages:/app" \
+    TTT_PROJECT_ROOT=/project \
+    HOME=/home/agent
+
+# `/project` is the mount point for the project's wiki dir. The orchestrator
+# bind-mounts `data/wiki/{project_id}` here at container start.
+VOLUME ["/project"]
+
+EXPOSE 8766
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=2 \
+  CMD ["/usr/bin/python", "-c", "import urllib.request; import os; urllib.request.urlopen('http://localhost:8766/readyz')"]
+
+COPY --chown=nonroot:nonroot --from=builder /app /app/
+COPY --chown=nonroot:nonroot --from=builder /home/agent /home/agent
+
+CMD ["/app/.venv/bin/uvicorn", "ttt.agent.main:app", "--host", "0.0.0.0", "--port", "8766"]
+
+FROM artifactory.devhub-cloud.cisco.com/sto-cg-docker/chainguard-base AS cert-builder
+
+# Copy your local custom certificate into the builder stage
+COPY deploy/certs/cisco_secure_access_root_ca.pem /usr/local/share/ca-certificates/
+RUN apk update && apk add ca-certificates && update-ca-certificates --fresh
+
+FROM production AS development
+
+# Copy the updated system-wide certificate bundle over to the minimal image
+COPY --from=cert-builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+ENV SSL_CERT_DIR=/etc/ssl/certs

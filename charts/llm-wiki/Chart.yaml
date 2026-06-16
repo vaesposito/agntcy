@@ -1,0 +1,11 @@
+apiVersion: v2
+name: llm-wiki
+description: Tiny Teams with Tokens — AI-powered per-project wiki
+type: application
+version: 0.1.5
+appVersion: "latest"
+dependencies:
+  - name: postgres-operator
+    version: "1.13.0"
+    repository: https://opensource.zalando.com/postgres-operator/charts/postgres-operator
+    condition: postgres-operator.enabled

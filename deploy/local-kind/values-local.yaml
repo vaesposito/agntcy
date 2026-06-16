@@ -1,0 +1,68 @@
+# Local kind cluster overrides — smaller footprint, ingress on port 3000,
+# OAuth redirect URIs identical to the docker-compose setup.
+
+image:
+  registry: localhost:5001/ghcr.io/cisco-eti
+  backend:
+    repository: tiny-teams-with-tokens-backend
+    tag: latest
+    pullPolicy: Always
+  frontend:
+    repository: tiny-teams-with-tokens-frontend
+    tag: latest
+    pullPolicy: Always
+  agent:
+    repository: tiny-teams-with-tokens-agent
+    tag: latest
+    pullPolicy: Always
+
+resources:
+  backend:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+  frontend:
+    requests:
+      memory: "128Mi"
+      cpu: "50m"
+    limits:
+      memory: "256Mi"
+
+postgres:
+  storageSize: "1Gi"
+  instances: 1
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "50m"
+    limits:
+      memory: "256Mi"
+
+persistence:
+  size: "1Gi"
+
+# Nginx ingress is installed via `make ingress-install`.
+# kind maps host port 3000 → container port 80, so the app is at
+# http://localhost:3000/apps/ttt — identical to the docker-compose URL.
+ingress:
+  enabled: true
+  className: nginx
+  host: localhost
+
+backendConfig:
+  LOG_LEVEL: "DEBUG"
+  CAIPE_PROXY: "false"
+  TTT_DEV_USER_EMAIL: "dev@local"
+  TTT_DEV_USER_NAME: "Dev User"
+  # Redirect URIs match the docker-compose setup (port 3000) so OAuth
+  # app registrations do not need to change between environments.
+  GITHUB_REDIRECT_URI: "http://localhost:3000/apps/ttt/oauth/github/callback"
+  CONFLUENCE_REDIRECT_URI: "http://localhost:3000/apps/ttt/oauth/confluence/callback"
+  WEBEX_REDIRECT_URI: "http://localhost:3000/apps/ttt/oauth/webex/callback"
+
+# The Zalando postgres-operator is installed once per cluster via
+# `make operator-install`. The chart must not manage its lifecycle.
+postgres-operator:
+  enabled: false

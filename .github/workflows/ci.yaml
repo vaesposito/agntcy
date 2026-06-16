@@ -1,0 +1,213 @@
+# .github/workflows/ci.yaml
+name: CI
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+  packages: write
+
+jobs:
+
+  # ── 1. Backend: checkout, lint, type-check, test ──────────────────────────
+  checkout-unit-tests-backend:
+    name: Backend – Lint, Type & Test
+    runs-on:
+      group: ${{ vars.DEFAULT_ARC_RUNNERS }}
+    container:
+      image: ${{ vars.DEFAULT_CONTAINER_RUNNER }}
+      options: --user root
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          clean: true
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR=/usr/local/bin sh
+
+      - name: Install dependencies
+        run: make backend-install
+
+      - name: Ruff lint
+        run: make lint
+
+      - name: Type check (ty)
+        run: make typecheck
+
+      - name: Pytest
+        run: make test
+
+  # ── 2. Frontend: typecheck + build ────────────────────────────────────────
+  checkout-unit-tests-frontend:
+    name: Frontend – Typecheck & Build
+    runs-on:
+      group: ${{ vars.DEFAULT_ARC_RUNNERS }}
+    container:
+      image: ${{ vars.DEFAULT_CONTAINER_RUNNER }}
+      options: --user root
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          clean: true
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install
+        run: make frontend-install
+
+      - name: Typecheck
+        run: make frontend-typecheck
+
+      - name: Build
+        run: make frontend-build
+
+  # ── 3. Docker Build & Push – Backend ──────────────────────────────────────
+  call-docker-build-push-backend:
+    name: Docker Build & Push (Backend)
+    needs: [checkout-unit-tests-backend]
+    uses: cisco-eti/gh-reusable-workflows/.github/workflows/build-push-docker.yaml@production
+    secrets:
+      vault-approle-role-id: ${{ secrets.VAULT_APPROLE_ROLE_ID }}
+      vault-approle-secret-id: ${{ secrets.VAULT_APPROLE_SECRET_ID }}
+      caller-github-token: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      runner-group: ${{ vars.DEFAULT_ARC_RUNNERS }}
+      runner-docker-image: ${{ vars.DEFAULT_CONTAINER_RUNNER }}
+      image-name: "tiny-teams-with-tokens-backend"
+      dockerfile: backend/Dockerfile
+      context: .
+      ghcr-enabled: true
+      ghcr-org-registry: ${{ vars.GHCR_REGISTRY }}
+
+  # ── 4. Docker Build & Push – Agent ──────────────────────────────────────
+  call-docker-build-push-agent:
+    name: Docker Build & Push (Agent)
+    needs: [checkout-unit-tests-backend]
+    uses: cisco-eti/gh-reusable-workflows/.github/workflows/build-push-docker.yaml@production
+    secrets:
+      vault-approle-role-id: ${{ secrets.VAULT_APPROLE_ROLE_ID }}
+      vault-approle-secret-id: ${{ secrets.VAULT_APPROLE_SECRET_ID }}
+      caller-github-token: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      runner-group: ${{ vars.DEFAULT_ARC_RUNNERS }}
+      runner-docker-image: ${{ vars.DEFAULT_CONTAINER_RUNNER }}
+      image-name: "tiny-teams-with-tokens-agent"
+      dockerfile: backend/Dockerfile.agent
+      context: .
+      ghcr-enabled: true
+      ghcr-org-registry: ${{ vars.GHCR_REGISTRY }}
+
+  # ── 4. Docker Build & Push – Frontend ─────────────────────────────────────
+  call-docker-build-push-frontend:
+    name: Docker Build & Push (Frontend)
+    needs: [checkout-unit-tests-frontend]
+    uses: cisco-eti/gh-reusable-workflows/.github/workflows/build-push-docker.yaml@production
+    secrets:
+      vault-approle-role-id: ${{ secrets.VAULT_APPROLE_ROLE_ID }}
+      vault-approle-secret-id: ${{ secrets.VAULT_APPROLE_SECRET_ID }}
+      caller-github-token: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      runner-group: ${{ vars.DEFAULT_ARC_RUNNERS }}
+      runner-docker-image: ${{ vars.DEFAULT_CONTAINER_RUNNER }}
+      image-name: "tiny-teams-with-tokens-frontend"
+      dockerfile: frontend/Dockerfile
+      context: .
+      ghcr-enabled: true
+      ghcr-org-registry: ${{ vars.GHCR_REGISTRY }}
+
+  # ── 5. Canary deployment trigger ───────────────────────────────────────────
+  # assisted-by Codex Codex-sonnet-4-6
+  compute-canary-image-tag:
+    name: Compute Canary Image Tag
+    needs:
+      - call-docker-build-push-backend
+      - call-docker-build-push-frontend
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on:
+      group: ${{ vars.DEFAULT_ARC_RUNNERS }}
+    container:
+      image: ${{ vars.DEFAULT_CONTAINER_RUNNER }}
+      options: --user root
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    outputs:
+      image-tag: ${{ steps.image-tag.outputs.image-tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          clean: true
+
+      - name: Compute image tag
+        id: image-tag
+        run: |
+          git config --global --add safe.directory '*'
+          image_tag="$(date +'%Y-%m-%d')-$(git rev-parse --short HEAD)"
+          echo "image-tag=${image_tag}" >> "$GITHUB_OUTPUT"
+          echo "Computed canary image tag: ${image_tag}"
+
+  call-trigger-canary-deploy:
+    name: Trigger Grid Canary Deploy
+    needs:
+      - compute-canary-image-tag
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    uses: cisco-eti/gh-reusable-workflows/.github/workflows/trigger-deploy.yaml@production
+    with:
+      runner-group: ${{ vars.DEFAULT_ARC_RUNNERS }}
+      runner-docker-image: ${{ vars.DEFAULT_CONTAINER_RUNNER }}
+      deployment-repo: cisco-eti/platform-apps-deployment
+      event-type: caipe-canary-ttt-argocd-sync-deployment
+      client-payload: >-
+        {
+          "app-repository": "${{ github.repository }}",
+          "image-tag": "${{ needs.compute-canary-image-tag.outputs.image-tag }}",
+          "backend-image": "ghcr.io/cisco-eti/tiny-teams-with-tokens-backend:${{ needs.compute-canary-image-tag.outputs.image-tag }}",
+          "frontend-image": "ghcr.io/cisco-eti/tiny-teams-with-tokens-frontend:${{ needs.compute-canary-image-tag.outputs.image-tag }}"
+        }
+    secrets:
+      github-app-id: ${{ secrets.GHA_APP_ID }}
+      github-app-private-key: ${{ secrets.GHA_APP_PRIVATE_KEY }}
+      vault-approle-role-id: ${{ secrets.VAULT_APPROLE_ROLE_ID }}
+      vault-approle-secret-id: ${{ secrets.VAULT_APPROLE_SECRET_ID }}
+
+  # ── 6. CI Status Gate (always last — lists ALL active jobs) ───────────────
+  reusable-workflow-ci-status:
+    name: Reusable Workflow CI Status
+    needs:
+      - checkout-unit-tests-backend
+      - checkout-unit-tests-frontend
+      - call-docker-build-push-backend
+      - call-docker-build-push-frontend
+      - compute-canary-image-tag
+      - call-trigger-canary-deploy
+    if: always()
+    runs-on:
+      group: ${{ vars.DEFAULT_ARC_RUNNERS }}
+    steps:
+      - name: Report failure
+        if: ${{ cancelled() || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'failure') }}
+        run: |
+          echo -e "\033[31m*** WORKFLOW FAILED ***\033[0m"
+          exit 1
+      - name: Report success
+        run: echo -e "\033[1;36m*** WORKFLOW SUCCESS ***\033[0m"

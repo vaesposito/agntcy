@@ -1,0 +1,141 @@
+image:
+  registry: ghcr.io/cisco-eti
+  backend:
+    repository: tiny-teams-with-tokens-backend
+    tag: latest
+    pullPolicy: IfNotPresent
+  frontend:
+    repository: tiny-teams-with-tokens-frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  agent:
+    repository: tiny-teams-with-tokens-agent
+    tag: latest
+
+imagePullSecrets: []
+
+nameOverride: ""
+fullnameOverride: ""
+
+backend:
+  replicaCount: 1
+
+frontend:
+  replicaCount: 1
+
+# Non-secret backend configuration. Empty strings are omitted from the ConfigMap
+# so the app falls back to its own defaults. TTT_BACKEND_URL and TTT_AGENT_IMAGE
+# are auto-computed from release name + image values when left empty.
+backendConfig:
+  LOG_LEVEL: "INFO"
+  TTT_ORCHESTRATOR: "k8s"
+  TTT_BACKEND_URL: ""
+  TTT_WIKI_DIR: "/data/wiki"
+  TTT_AGENT_IMAGE: ""
+  CAIPE_PROXY: "false"
+  TTT_DEV_USER_EMAIL: ""
+  TTT_DEV_USER_NAME: ""
+  TTT_JWT_DISABLED: "false"
+  TTT_JWT_JWKS_URI: ""
+  TTT_JWT_ISSUER: ""
+  TTT_JWT_AUDIENCE: ""
+  GITHUB_REDIRECT_URI: ""
+  CONFLUENCE_REDIRECT_URI: ""
+  WEBEX_REDIRECT_URI: ""
+  INGEST_MODEL: "claude-haiku-4-5"
+  CHAT_MODEL: "claude-sonnet-4-6"
+  # Storage class for per-project agent PVCs (wiki + sessions).
+  # Empty string uses the cluster's default storage class.
+  TTT_K8S_STORAGE_CLASS: ""
+
+# Non-secret frontend configuration. TTT_API_URL is auto-computed when empty.
+frontendConfig:
+  BASE_PATH: "/apps/ttt"
+  TTT_API_URL: ""
+  CAIPE_PROXY: "false"
+
+# Secrets — set at install time; never commit values with real credentials.
+# TTT_DATABASE_URL is auto-constructed from postgres.user/database/host when empty.
+# POSTGRES_PASSWORD is required and immutable after first install (Zalando initdb).
+secrets:
+  ANTHROPIC_API_KEY: ""
+  ANTHROPIC_AUTH_TOKEN: ""
+  ANTHROPIC_BASE_URL: ""
+  GITHUB_TOKEN: ""
+  GITHUB_CLIENT_SECRET: ""
+  CONFLUENCE_TOKEN: ""
+  CONFLUENCE_CLIENT_SECRET: ""
+  CONFLUENCE_USER: ""
+  WEBEX_TOKEN: ""
+  WEBEX_CLIENT_SECRET: ""
+  TTT_DATABASE_URL: ""
+  POSTGRES_PASSWORD: ""
+
+postgres:
+  enabled: true
+  instances: 1
+  version: "16"
+  storageSize: "5Gi"
+  storageClass: ""
+  teamId: "llm-wiki"
+  # Underscore required: PostgreSQL identifiers cannot contain hyphens.
+  database: llm_wiki
+  # User name cannot contain hyphens because secret name is based on it and must be a valid DNS subdomain.
+  user: llmwiki
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+
+rbac:
+  create: true
+  # Namespace where agent Pods are created. Defaults to Release.Namespace.
+  agentNamespace: ""
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: "10Gi"
+  # Use an existing PVC instead of creating a new one.
+  existingClaim: ""
+
+service:
+  backend:
+    type: ClusterIP
+    port: 8765
+  frontend:
+    type: ClusterIP
+    port: 3000
+
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  host: llm-wiki.example.com
+  tls: []
+
+resources:
+  backend:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1Gi"
+  frontend:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Zalando postgres-operator subchart passthrough.
+# Set enabled: false when the operator is already installed cluster-wide.
+postgres-operator:
+  enabled: true

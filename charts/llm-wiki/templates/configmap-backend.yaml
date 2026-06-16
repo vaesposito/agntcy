@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "llm-wiki.fullname" . }}-backend-config
+  labels:
+    {{- include "llm-wiki.labels" . | nindent 4 }}
+data:
+  {{/*
+  Render all non-empty backendConfig values. Empty strings are skipped so the
+  app can fall back to its own built-in defaults (pydantic-settings behaviour).
+  TTT_BACKEND_URL and TTT_AGENT_IMAGE are handled separately below because they
+  have auto-computed values when left blank.
+  */}}
+  {{- range $k, $v := .Values.backendConfig }}
+  {{- if and $v (ne $k "TTT_BACKEND_URL") (ne $k "TTT_AGENT_IMAGE") }}
+  {{ $k }}: {{ $v | quote }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.backendConfig.TTT_BACKEND_URL }}
+  TTT_BACKEND_URL: {{ .Values.backendConfig.TTT_BACKEND_URL | quote }}
+  {{- else }}
+  TTT_BACKEND_URL: {{ include "llm-wiki.backendUrl" . | quote }}
+  {{- end }}
+  {{- if .Values.backendConfig.TTT_AGENT_IMAGE }}
+  TTT_AGENT_IMAGE: {{ .Values.backendConfig.TTT_AGENT_IMAGE | quote }}
+  {{- else }}
+  TTT_AGENT_IMAGE: {{ printf "%s/%s:%s" .Values.image.registry .Values.image.agent.repository .Values.image.agent.tag | quote }}
+  {{- end }}

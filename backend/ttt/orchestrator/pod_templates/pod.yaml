@@ -1,0 +1,54 @@
+# Static pod shape for per-project agent containers.
+# Dynamic fields — name, namespace, labels, image, env, pvc claimNames, and
+# wiki readOnly — are injected by KubernetesOrchestrator._build_pod_spec().
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ""
+  namespace: ""
+  labels:
+    ttt.role: "agent"
+    ttt.project_id: ""
+    ttt.agent_role: ""
+spec:
+  restartPolicy: Always
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: agent
+      image: ""
+      imagePullPolicy: Always
+      ports:
+        - name: http
+          containerPort: 8766
+          protocol: TCP
+      env: []
+      volumeMounts:
+        - name: wiki
+          mountPath: /project
+          readOnly: false     # overridden to true for viewer role
+        - name: sessions
+          mountPath: /home/agent
+          readOnly: false
+      readinessProbe:
+        httpGet:
+          path: /readyz
+          port: 8766
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        timeoutSeconds: 3
+        failureThreshold: 6
+      livenessProbe:
+        httpGet:
+          path: /healthz
+          port: 8766
+        initialDelaySeconds: 15
+        periodSeconds: 20
+        timeoutSeconds: 5
+  volumes:
+    - name: wiki
+      persistentVolumeClaim:
+        claimName: ""
+    - name: sessions
+      persistentVolumeClaim:
+        claimName: ""

@@ -1,0 +1,23 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+containerdConfigPatches:
+- |-
+  [plugins."io.containerd.grpc.v1.cri".registry]
+    config_path = "/etc/containerd/certs.d"
+nodes:
+  - role: control-plane
+    kubeadmConfigPatches:
+      - |
+        kind: InitConfiguration
+        nodeRegistration:
+          kubeletExtraArgs:
+            node-labels: "ingress-ready=true"
+    extraPortMappings:
+      # Host port 3000 → container port 80 so that OAuth redirect URIs
+      # (http://localhost:3000/...) match the local Docker Compose setup.
+      - containerPort: 80
+        hostPort: 3000
+        protocol: TCP
+      - containerPort: 443
+        hostPort: 3443
+        protocol: TCP

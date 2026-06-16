@@ -1,0 +1,60 @@
+llm-wiki has been deployed.
+
+{{- if .Values.ingress.enabled }}
+
+Frontend URL: https://{{ .Values.ingress.host }}{{ .Values.frontendConfig.BASE_PATH }}
+{{- else }}
+
+To access the frontend, run:
+  kubectl port-forward svc/{{ include "llm-wiki.fullname" . }}-frontend {{ .Values.service.frontend.port }}:{{ .Values.service.frontend.port }}
+
+Then open: http://localhost:{{ .Values.service.frontend.port }}{{ .Values.frontendConfig.BASE_PATH }}
+{{- end }}
+
+IMPORTANT CAVEATS
+=================
+
+1. POSTGRES PASSWORD IS IMMUTABLE
+   The value of secrets.POSTGRES_PASSWORD is written into the Zalando credentials
+   secret only once, at cluster initdb. Changing it via `helm upgrade` will NOT
+   update the running database password. To rotate it, use `ALTER ROLE` manually
+   or re-provision the cluster (data loss without a backup).
+
+2. SINGLE REPLICA ONLY (default storage)
+   backend.replicaCount > 1 is unsupported with ReadWriteOnce storage. Multiple
+   replicas require a ReadWriteMany storage class (NFS, CephFS, cloud RWX PVC).
+
+3. INSTALL POSTGRES OPERATOR BEFORE THIS CHART
+   The postgres-operator subchart installs the Zalando operator CRDs and controller.
+   Helm does not guarantee CRD readiness before chart templates are applied. For
+   reliable deployments, install the operator separately first, then set:
+     --set postgres-operator.enabled=false
+
+   Example:
+     helm repo add postgres-operator-charts \
+       https://opensource.zalando.com/postgres-operator/charts/postgres-operator
+     helm install postgres-operator postgres-operator-charts/postgres-operator
+     helm install llm-wiki ./charts/llm-wiki --set postgres-operator.enabled=false ...
+
+4. PVC IS RETAINED ON UNINSTALL
+   The /data PVC (SQLite DB + wiki cache) carries the annotation
+   helm.sh/resource-policy: keep. `helm uninstall` will NOT delete it. To fully
+   clean up, run:
+     kubectl delete pvc {{ include "llm-wiki.fullname" . }}-data
+
+5. PER-PROJECT AGENT PODS
+   The KubernetesOrchestrator creates one Pod + ClusterIP Service per project
+   per role (editor/viewer) on demand. PVCs are provisioned automatically:
+     ttt-wiki-{project_id}           -- 5Gi, wiki page cache
+     ttt-sessions-{project_id}-role  -- 1Gi, Claude SDK transcript store
+   These PVCs carry helm.sh/resource-policy: keep and are NOT deleted when
+   the agent pod is stopped. To reclaim storage, delete them manually:
+     kubectl delete pvc -l ttt.role=agent
+
+   The backend discovers its own namespace from the service-account token and
+   creates agent pods in the same namespace. The ServiceAccount bound to the
+   {{ include "llm-wiki.fullname" . }}-agent-manager Role provides the required
+   permissions (pods, pvcs, services, secrets).
+
+   Set TTT_K8S_STORAGE_CLASS in backendConfig to use a non-default storage class
+   for agent PVCs (empty string uses the cluster default).
