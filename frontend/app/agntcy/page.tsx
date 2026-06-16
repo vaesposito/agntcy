@@ -81,19 +81,19 @@ export default function AgntcyPage() {
             alt="AGNTCY"
             className="h-14 w-auto md:h-16 lg:h-20"
           />
-          <div className="flex items-center gap-2.5 text-sm text-white md:text-base">
+          <div className="flex items-center gap-2 text-xs text-white md:text-sm">
             <span>part of</span>
             <img
               src="/agntcy/linux-foundation.svg"
               width={321}
               height={19}
               alt="Linux Foundation"
-              className="h-5 w-auto md:h-6"
+              className="h-4 w-auto md:h-5"
             />
           </div>
         </div>
 
-        <h1 className="mt-8 max-w-4xl text-2xl font-light leading-tight text-[#fbaf45] md:text-3xl lg:text-4xl">
+        <h1 className="mt-8 max-w-4xl text-3xl font-light leading-tight text-[#fbaf45] md:text-4xl lg:text-5xl">
           Building the Internet of Agents (IoA)
         </h1>
 
