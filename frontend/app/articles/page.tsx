@@ -228,16 +228,7 @@ export default function ArticlesPage() {
           </p>
 
           <section className="mt-16 3xl:mt-24">
-            <h2 className="text-xl font-bold text-[#e8e9ea] md:text-2xl 3xl:text-3xl">
-              All articles
-            </h2>
-            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#e8e9ea]/80 md:text-base 3xl:mt-3 3xl:text-xl">
-              Browse posts from both blogs. Filter by source and sort by the
-              most recent.
-            </p>
-            <div className="mt-6 3xl:mt-8">
-              <ArticleGrid articles={ARTICLES} />
-            </div>
+            <ArticleGrid articles={ARTICLES} />
           </section>
         </main>
         <AgntcyFooter />

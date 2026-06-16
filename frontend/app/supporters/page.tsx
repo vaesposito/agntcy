@@ -10,6 +10,7 @@ import {
   type Supporter,
 } from "@/components/supporter-logo-wall";
 import { TscLogos } from "@/components/tsc-logos";
+import { SectionTabs } from "@/components/section-tabs";
 import { withBase } from "@/lib/site";
 import { urlForLogo } from "@/lib/company-urls";
 
@@ -30,7 +31,7 @@ const NAV_LINKS = [
   { label: "Github", href: "https://github.com/agntcy" },
 ];
 
-const SUB_NAV_LINKS = [
+const SECTION_TABS = [
   { label: "Supporters", href: "#supporters" },
   { label: "Technical Steering Committee", href: "#tsc" },
   { label: "They say about us", href: "#testimonials" },
@@ -258,7 +259,7 @@ export default function SupportersPage() {
           className="block h-auto w-[70%] select-none"
         />
 
-        <header className="flex justify-end px-8 py-6 md:px-[90px] md:py-8 lg:pl-[200px] lg:pr-[150px] 3xl:pl-[260px] 3xl:pr-[200px] 3xl:py-12">
+        <header className="sticky top-0 z-30 flex flex-wrap items-center justify-end gap-x-6 gap-y-3 border-b border-[#0d274d] bg-[#00142b]/95 px-8 py-4 backdrop-blur supports-[backdrop-filter]:bg-[#00142b]/80 md:px-[90px] md:py-5 lg:pl-[200px] lg:pr-[150px] 3xl:pl-[260px] 3xl:pr-[200px] 3xl:py-7">
           <nav className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm text-white md:gap-x-8 md:text-base 3xl:gap-x-10 3xl:text-xl">
             {NAV_LINKS.map((link) =>
               link.href.startsWith("/") ? (
@@ -282,25 +283,8 @@ export default function SupportersPage() {
               ),
             )}
           </nav>
+          <SectionTabs tabs={SECTION_TABS} />
         </header>
-
-        <nav
-          aria-label="Section navigation"
-          className="sticky top-0 z-30 border-y border-[#0d274d] bg-[#00142b]/95 px-8 py-3 backdrop-blur supports-[backdrop-filter]:bg-[#00142b]/80 md:px-[90px] lg:pl-[200px] lg:pr-[150px] 3xl:pl-[260px] 3xl:pr-[200px]"
-        >
-          <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85 md:gap-x-8 md:text-base 3xl:gap-x-10 3xl:text-xl">
-            {SUB_NAV_LINKS.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  className="cursor-pointer bg-[linear-gradient(#fbaf45,#fbaf45)] bg-[length:0%_2px] bg-[position:0_100%] bg-no-repeat pb-1 transition-[color,background-size] duration-200 hover:bg-[length:100%_2px] hover:text-[#fbaf45]"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </nav>
 
         <main className="px-8 pb-20 pt-6 md:px-[90px] md:pt-12 lg:pl-[200px] lg:pr-[150px] 3xl:pl-[260px] 3xl:pr-[200px] 3xl:pt-16 3xl:pb-28">
           <Link
@@ -321,7 +305,7 @@ export default function SupportersPage() {
 
           <section
             id="supporters"
-            className="scroll-mt-24 3xl:scroll-mt-32"
+            className="scroll-mt-28 3xl:scroll-mt-36"
           >
             <h1 className="mt-10 max-w-4xl text-3xl font-light leading-tight text-[#fbaf45] md:text-4xl lg:text-5xl 3xl:mt-14 3xl:max-w-5xl 3xl:text-6xl">
               Our Supporters
@@ -338,7 +322,7 @@ export default function SupportersPage() {
 
           <section
             id="tsc"
-            className="mt-20 scroll-mt-24 border-t border-[#0d274d] pt-16 3xl:mt-28 3xl:scroll-mt-32 3xl:pt-24"
+            className="mt-20 scroll-mt-28 border-t border-[#0d274d] pt-16 3xl:mt-28 3xl:scroll-mt-36 3xl:pt-24"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#fbaf45] 3xl:text-base">
               Technical Steering Committee
@@ -355,7 +339,7 @@ export default function SupportersPage() {
 
           <section
             id="testimonials"
-            className="mt-20 scroll-mt-24 border-t border-[#0d274d] pt-16 3xl:mt-28 3xl:scroll-mt-32 3xl:pt-24"
+            className="mt-20 scroll-mt-28 border-t border-[#0d274d] pt-16 3xl:mt-28 3xl:scroll-mt-36 3xl:pt-24"
           >
             <h2 className="max-w-4xl text-3xl font-light leading-tight text-[#fbaf45] md:text-4xl lg:text-5xl 3xl:max-w-5xl 3xl:text-6xl">
               They say about us

@@ -145,8 +145,9 @@ export function TestimonialModalWall({
                   logo={active.logo}
                   company={active.company}
                   url={active.url}
-                  className="inline-flex h-10 max-w-[200px] items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-3 3xl:h-14 3xl:max-w-[280px] 3xl:px-4"
-                  wordmarkClassName="inline-flex h-10 items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-4 text-base font-semibold tracking-tight text-white 3xl:h-14 3xl:text-xl"
+                  className="inline-flex h-14 max-w-[240px] items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-4 3xl:h-20 3xl:max-w-[340px] 3xl:px-6"
+                  wordmarkClassName="inline-flex h-14 items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-5 text-lg font-semibold tracking-tight text-white 3xl:h-20 3xl:text-2xl"
+                  imgClassName="h-9 w-auto max-w-full object-contain 3xl:h-12"
                 />
                 <div>
                   <p className="text-base font-bold text-white 3xl:text-2xl">
