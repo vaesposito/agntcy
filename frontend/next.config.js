@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 //
+// outputFileTracingRoot pins the workspace root to this frontend directory.
+// Without it, Next infers the root from the nearest lockfile and can pick a
+// stray lockfile higher up the tree (e.g. ~/package-lock.json), which breaks
+// the dev client manifest and stops the global stylesheet from being served.
+const path = require("path");
+//
 // When mounted behind a reverse proxy (e.g. CAIPE) set:
 //   CAIPE_PROXY=1
 //   BASE_PATH=/apps/ttt           (default: /ttt)
@@ -14,6 +20,7 @@ const resolvedBasePath = process.env.CAIPE_PROXY
   : "";
 
 const nextConfig = {
+  outputFileTracingRoot: path.join(__dirname),
   ...(process.env.CAIPE_PROXY && {
     basePath: resolvedBasePath,
     ...(process.env.ASSET_PREFIX ? { assetPrefix: process.env.ASSET_PREFIX } : {}),
