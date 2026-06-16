@@ -110,6 +110,7 @@ const ARTICLES: Article[] = [
     source: "Outshift Blog",
     title: "AI observability in multi-agent systems using OpenTelemetry",
     href: "https://outshift.cisco.com/blog/ai-observability-multi-agent-systems-opentelemetry",
+    date: "2025-09-22",
     excerpt:
       "Microsoft, Splunk work with AGNTCY to introduce new semantic conventions into OpenTelemetry.",
   },
@@ -118,6 +119,7 @@ const ARTICLES: Article[] = [
     title:
       "AGNTCY project donated to Linux Foundation with major industry backing",
     href: "https://outshift.cisco.com/blog/agntcy-donated-to-linux-foundation",
+    date: "2025-07-29",
     excerpt:
       "Cisco, Dell Technologies, Google Cloud, Oracle and Red Hat join as formative members, alongside 75+ companies supporting AGNTCY.",
   },
@@ -125,6 +127,7 @@ const ARTICLES: Article[] = [
     source: "Outshift Blog",
     title: "The 4 phases for successful development of multi-agent software",
     href: "https://outshift.cisco.com/blog/four-phases-for-development-of-multi-agent-apps",
+    date: "2025-03-04",
     excerpt:
       "How to build multi-agent systems — four phases from idea to deployment.",
   },
@@ -133,6 +136,7 @@ const ARTICLES: Article[] = [
     title:
       "Webex and AGNTCY: How this healthcare booking multi-agent system showcases enterprise innovation",
     href: "https://outshift.cisco.com/blog/webex-agntcy-multi-agent-systems",
+    date: "2025-10-15",
     excerpt:
       "Building a multi-agent system for a healthcare contact center.",
   },
@@ -141,6 +145,7 @@ const ARTICLES: Article[] = [
     title:
       "How SoftServe used AGNTCY to implement a multi-agent intelligence system for video monitoring",
     href: "https://outshift.cisco.com/blog/how-softserve-used-agntcy-multi-agent-intelligence-video-monitoring",
+    date: "2025-11-14",
     excerpt:
       "See how SoftServe overcame intelligent video monitoring challenges with scalable, modular, real-time solutions.",
   },
@@ -149,6 +154,7 @@ const ARTICLES: Article[] = [
     title:
       "Hands-on with CAIPE: Building an open source, multi-agent system for platform engineering",
     href: "https://outshift.cisco.com/blog/caipe-building-open-source-multi-agent-systems-for-platform-engineering",
+    date: "2025-09-05",
     excerpt:
       "How the open source Community AI Platform Engineering (CAIPE) project leverages AGNTCY components.",
   },
@@ -157,6 +163,7 @@ const ARTICLES: Article[] = [
     title:
       "Building multi-agentic systems with AGNTCY's Application SDK and reference application",
     href: "https://outshift.cisco.com/blog/multi-agentic-systems-agntcy-application-sdk-reference-application",
+    date: "2025-07-23",
     excerpt:
       "The Sock Shop for the Internet of Agents — reference application and SDK showcasing AGNTCY.",
   },
