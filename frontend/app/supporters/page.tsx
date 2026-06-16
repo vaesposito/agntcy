@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Quote } from "lucide-react";
 import { AgntcyFooter } from "@/components/agntcy-footer";
+import { withBase } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Supporters — AGNTCY",
@@ -147,7 +148,7 @@ export default function SupportersPage() {
     <div className="fixed inset-0 overflow-y-auto bg-[#00142b] font-sans text-[#e8e9ea]">
       <div className="mx-auto w-full max-w-[1512px] 3xl:max-w-[2040px] 4xl:max-w-[2560px]">
         <img
-          src="/agntcy/banner-stripes.svg"
+          src={withBase("/agntcy/banner-stripes.svg")}
           width={1258}
           height={26}
           alt=""
@@ -185,7 +186,7 @@ export default function SupportersPage() {
             className="group inline-flex items-center gap-x-4 gap-y-2"
           >
             <img
-              src="/agntcy/logo.svg"
+              src={withBase("/agntcy/logo.svg")}
               width={513}
               height={116}
               alt="AGNTCY — back to home"
@@ -228,7 +229,7 @@ export default function SupportersPage() {
                   {logo ? (
                     <span className="inline-flex h-8 max-w-[160px] items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-2.5 3xl:h-11 3xl:max-w-[220px] 3xl:px-3.5">
                       <img
-                        src={logo}
+                        src={withBase(logo)}
                         alt={`${t.company} logo`}
                         loading="lazy"
                         className="h-4 w-auto max-w-full object-contain 3xl:h-6"

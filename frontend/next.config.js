@@ -15,16 +15,39 @@ const path = require("path");
 // honored if explicitly provided (e.g. for CDN deploys).
 //
 // Without CAIPE_PROXY the app behaves exactly as standalone (root path).
-const resolvedBasePath = process.env.CAIPE_PROXY
-  ? process.env.BASE_PATH || "/ttt"
-  : "";
+// GITHUB_PAGES=true switches the build into a fully static export tailored
+// for publishing the AGNTCY marketing pages at vaesposito.github.io/agntcy/.
+// It is intentionally separate from the CAIPE_PROXY path: normal Docker/dev
+// builds (plain `next build` / `next dev`) set neither env and are unchanged.
+const isGithubPages = process.env.GITHUB_PAGES === "true";
+
+const resolvedBasePath = isGithubPages
+  ? "/agntcy"
+  : process.env.CAIPE_PROXY
+    ? process.env.BASE_PATH || "/ttt"
+    : "";
 
 const nextConfig = {
   outputFileTracingRoot: path.join(__dirname),
-  ...(process.env.CAIPE_PROXY && {
-    basePath: resolvedBasePath,
-    ...(process.env.ASSET_PREFIX ? { assetPrefix: process.env.ASSET_PREFIX } : {}),
-  }),
+  ...(isGithubPages
+    ? {
+        output: "export",
+        basePath: resolvedBasePath,
+        assetPrefix: resolvedBasePath,
+        images: { unoptimized: true },
+        // Emit directory-style routes (agntcy/index.html) so GitHub Pages serves
+        // clean URLs without per-file .html rewriting quirks.
+        trailingSlash: true,
+        // Use a dedicated dir so the export build never shares (and corrupts)
+        // the default `.next` used by a running `next dev`. NOTE: with a custom
+        // distDir, Next writes the static export INTO this directory (i.e.
+        // `.next-pages/`, not `out/`); the deploy workflow uploads it as-is.
+        distDir: ".next-pages",
+      }
+    : process.env.CAIPE_PROXY && {
+        basePath: resolvedBasePath,
+        ...(process.env.ASSET_PREFIX ? { assetPrefix: process.env.ASSET_PREFIX } : {}),
+      }),
   // Surface basePath into the client bundle so plain `fetch("/api/...")`
   // helpers can prefix correctly even at SSR time. (Next does NOT include
   // basePath in plain fetch URLs; it only rewrites <Link>/router navigation.)

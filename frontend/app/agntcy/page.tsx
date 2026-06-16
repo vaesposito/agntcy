@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { SquareArrowOutUpRight } from "lucide-react";
 import { AgntcyFooter } from "@/components/agntcy-footer";
+import { withBase } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "AGNTCY — Building the Internet of Agents",
@@ -60,7 +61,7 @@ export default function AgntcyPage() {
     <div className="fixed inset-0 overflow-y-auto bg-[#00142b] font-sans text-[#e8e9ea]">
       <div className="mx-auto w-full max-w-[1512px] 3xl:max-w-[2040px] 4xl:max-w-[2560px]">
       <img
-        src="/agntcy/banner-stripes.svg"
+        src={withBase("/agntcy/banner-stripes.svg")}
         width={1258}
         height={26}
         alt=""
@@ -73,7 +74,7 @@ export default function AgntcyPage() {
           {NAV_LINKS.map((link) => (
             <a
               key={link.label}
-              href={link.href}
+              href={link.href.startsWith("/") ? withBase(link.href) : link.href}
               className="cursor-pointer bg-[linear-gradient(#fbaf45,#fbaf45)] bg-[length:0%_2px] bg-[position:0_100%] bg-no-repeat pb-1 text-white transition-[color,background-size] duration-200 hover:bg-[length:100%_2px] hover:text-[#fbaf45]"
             >
               {link.label}
@@ -85,7 +86,7 @@ export default function AgntcyPage() {
       <main className="px-8 pb-20 pt-6 md:px-[90px] md:pt-12 lg:pl-[200px] lg:pr-[150px] 3xl:pl-[260px] 3xl:pr-[200px] 3xl:pt-16 3xl:pb-28">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3 3xl:gap-x-8">
           <img
-            src="/agntcy/logo.svg"
+            src={withBase("/agntcy/logo.svg")}
             width={513}
             height={116}
             alt="AGNTCY"
@@ -94,7 +95,7 @@ export default function AgntcyPage() {
           <div className="flex items-center gap-2 text-xs text-white md:text-sm 3xl:text-lg">
             <span>part of</span>
             <img
-              src="/agntcy/linux-foundation.svg"
+              src={withBase("/agntcy/linux-foundation.svg")}
               width={321}
               height={19}
               alt="Linux Foundation"
@@ -120,7 +121,7 @@ export default function AgntcyPage() {
           >
             Github
             <img
-              src="/agntcy/github.svg"
+              src={withBase("/agntcy/github.svg")}
               width={22}
               height={21}
               alt=""
@@ -134,7 +135,7 @@ export default function AgntcyPage() {
           >
             Learn more
             <img
-              src="/agntcy/arrow-forward.svg"
+              src={withBase("/agntcy/arrow-forward.svg")}
               width={18}
               height={18}
               alt=""
@@ -160,7 +161,7 @@ export default function AgntcyPage() {
               />
               <div className="flex justify-center">
                 <img
-                  src={card.icon}
+                  src={withBase(card.icon)}
                   width={card.iconWidth}
                   height={card.iconHeight}
                   alt=""
@@ -189,7 +190,7 @@ export default function AgntcyPage() {
                 className="flex h-20 items-center justify-center rounded-[16px] border border-[#0d274d] bg-[#00142b] px-5 shadow-[0px_4px_30px_#0d274d] transition-shadow duration-300 hover:shadow-[0px_8px_50px_rgba(24,122,220,0.45)] 3xl:h-28 3xl:rounded-[22px] 3xl:px-7"
               >
                 <img
-                  src={member.logo}
+                  src={withBase(member.logo)}
                   alt={member.name}
                   loading="lazy"
                   className="max-h-9 w-auto max-w-full object-contain 3xl:max-h-14"

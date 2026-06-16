@@ -1,0 +1,107 @@
+name: Deploy AGNTCY marketing pages to GitHub Pages
+
+# Publishes ONLY the static AGNTCY marketing pages (/agntcy, /supporters,
+# /articles) as a Next.js static export. The full tiny-teams dashboard and the
+# FastAPI backend are dynamic and are intentionally not functional on Pages —
+# the export is gated behind GITHUB_PAGES=true (see frontend/next.config.js).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Least privilege for the GitHub Pages deployment flow.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Only one Pages deployment at a time; let an in-flight run finish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Configure Pages
+        # enablement: true turns on GitHub Pages (source = GitHub Actions) on the
+        # first run if it is not already enabled via the API.
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Remove dynamic API proxy route
+        # app/api/[[...path]] is an inherently dynamic backend proxy and cannot be
+        # statically exported (Next requires static-literal segment config, so it
+        # cannot be env-gated in source). It is useless on Pages anyway, so drop it
+        # for the export only. The checkout is ephemeral, so this is non-destructive.
+        run: rm -rf "app/api"
+
+      - name: Build static export
+        # GITHUB_PAGES=true switches next.config.js to output: 'export' with a
+        # dedicated distDir of `.next-pages`. With a custom distDir, Next writes
+        # the static export INTO that directory (not `out/`), which also keeps it
+        # from sharing/corrupting the default `.next` build cache.
+        run: npm run build
+        env:
+          GITHUB_PAGES: "true"
+
+      - name: Add .nojekyll and root redirect
+        # .nojekyll stops GitHub Pages from stripping Next's _next/ directory.
+        # The site root (https://vaesposito.github.io/agntcy/) lands on the home
+        # dashboard shell by default; replace it with a redirect to the AGNTCY
+        # marketing landing page at ./agntcy/.
+        run: |
+          touch .next-pages/.nojekyll
+          cat > .next-pages/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>AGNTCY</title>
+              <link rel="canonical" href="./agntcy/" />
+              <meta http-equiv="refresh" content="0; url=./agntcy/" />
+              <script>window.location.replace("./agntcy/");</script>
+            </head>
+            <body style="background:#00142b;color:#e8e9ea;font-family:sans-serif">
+              <p>Redirecting to <a href="./agntcy/" style="color:#fbaf45">AGNTCY</a>…</p>
+            </body>
+          </html>
+          EOF
+
+      - name: Upload Pages artifact
+        # Only the artifact's contents become the site root, so the source dir
+        # name (.next-pages) never appears in the published URLs.
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/.next-pages
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

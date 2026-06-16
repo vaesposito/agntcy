@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SquareArrowOutUpRight, BookOpen } from "lucide-react";
 import { AgntcyFooter } from "@/components/agntcy-footer";
+import { withBase } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Articles — AGNTCY",
@@ -71,7 +72,7 @@ export default function ArticlesPage() {
     <div className="fixed inset-0 overflow-y-auto bg-[#00142b] font-sans text-[#e8e9ea]">
       <div className="mx-auto w-full max-w-[1512px] 3xl:max-w-[2040px] 4xl:max-w-[2560px]">
         <img
-          src="/agntcy/banner-stripes.svg"
+          src={withBase("/agntcy/banner-stripes.svg")}
           width={1258}
           height={26}
           alt=""
@@ -109,7 +110,7 @@ export default function ArticlesPage() {
             className="group inline-flex items-center gap-x-4 gap-y-2"
           >
             <img
-              src="/agntcy/logo.svg"
+              src={withBase("/agntcy/logo.svg")}
               width={513}
               height={116}
               alt="AGNTCY — back to home"
