@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 const NAV_LINKS = [
   { label: "Documentation", href: "#" },
   { label: "Articles", href: "#" },
-  { label: "Supporters", href: "#" },
+  { label: "Supporters", href: "/supporters" },
   { label: "YouTube", href: "#" },
   { label: "Github", href: "https://github.com" },
 ];
