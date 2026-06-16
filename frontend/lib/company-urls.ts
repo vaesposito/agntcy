@@ -1,0 +1,85 @@
+// Maps a logo asset (by file basename in public/agntcy/logos/) to the company's
+// official homepage. Only companies whose canonical site could be confidently
+// determined are listed here; logos without an entry render non-linked rather
+// than pointing somewhere wrong. Multiple filename variants (e.g. the testimonial
+// vs. supporter-wall crops) map to the same destination.
+const LOGO_URLS: Record<string, string> = {
+  // Technical Steering Committee / formative members
+  "cisco.png": "https://www.cisco.com",
+  "dell.png": "https://www.dell.com",
+  "google.png": "https://cloud.google.com",
+  "oracle.png": "https://www.oracle.com",
+  "redhat.png": "https://www.redhat.com",
+
+  // Supporters & testimonial companies
+  "ag2-logo.png": "https://ag2.ai",
+  "ag2.png": "https://ag2.ai",
+  "aisera.png": "https://aisera.com",
+  "anon-logo.png": "https://www.anon.com",
+  "arcblock.svg": "https://www.arcblock.io",
+  "arizeai.png": "https://arize.com",
+  "aviz.png": "https://www.aviznetworks.com",
+  "aviz-networks.png": "https://www.aviznetworks.com",
+  "beam.png": "https://www.beam.ai",
+  "boomi-2.png": "https://boomi.com",
+  "boomi.png": "https://boomi.com",
+  "browserbase.png": "https://www.browserbase.com",
+  "ciroos.png": "https://www.ciroos.ai",
+  "comet.png": "https://www.comet.com",
+  "crewai-logo.png": "https://www.crewai.com",
+  "crewai.png": "https://www.crewai.com",
+  "dagger.png": "https://dagger.io",
+  "dynamiq-logo.png": "https://www.getdynamiq.ai",
+  "dynamiq.png": "https://www.getdynamiq.ai",
+  "ema.png": "https://www.ema.co",
+  "fabrix-ai.png": "https://www.fabrix.ai",
+  "galileo.png": "https://galileo.ai",
+  "glean.svg": "https://www.glean.com",
+  "haize-labs-white.png": "https://www.haizelabs.com",
+  "haize-labs.png": "https://www.haizelabs.com",
+  "human-security.png": "https://www.humansecurity.com",
+  "hyperbolic.png": "https://hyperbolic.xyz",
+  "infinitus.svg": "https://www.infinitus.ai",
+  "infosys.png": "https://www.infosys.com",
+  "komodor-logo.png": "https://komodor.com",
+  "komodor.png": "https://komodor.com",
+  "langchain-updated.png": "https://www.langchain.com",
+  "letta.svg": "https://www.letta.com",
+  "lightningai.png": "https://lightning.ai",
+  "llamaindex.png": "https://www.llamaindex.ai",
+  "lleverage.png": "https://www.lleverage.ai",
+  "mem0.png": "https://mem0.ai",
+  "mongodb-logo.png": "https://www.mongodb.com",
+  "mozilla.png": "https://www.mozilla.org",
+  "naptha-ai.png": "https://www.naptha.ai",
+  "nurix-ai.svg": "https://www.nurix.ai",
+  "onetrust.png": "https://www.onetrust.com",
+  "opaque.png": "https://www.opaque.co",
+  "orium.png": "https://orium.com",
+  "ory.png": "https://www.ory.sh",
+  "permit-logo-variant3.png": "https://www.permit.io",
+  "persistent.png": "https://www.persistent.com",
+  "presidio.png": "https://www.presidio.com",
+  "pydantic.png": "https://pydantic.dev",
+  "redis.png": "https://redis.io",
+  "skyfire.png": "https://www.skyfire.xyz",
+  "smythos.png": "https://smythos.com",
+  "snaplogic.png": "https://www.snaplogic.com",
+  "softserve.svg": "https://www.softserveinc.com",
+  "superbo.png": "https://www.superbo.ai",
+  "traceloop.png": "https://www.traceloop.com",
+  "ushur.svg": "https://ushur.com",
+  "valtech.png": "https://www.valtech.com",
+  "vijil.png": "https://www.vijil.ai",
+  "voltagent.png": "https://voltagent.dev",
+  "wayfound.png": "https://www.wayfound.ai",
+  "weaviate-wh.png": "https://weaviate.io",
+  "weaviate.png": "https://weaviate.io",
+  "zep.png": "https://www.getzep.com",
+};
+
+export function urlForLogo(logo?: string): string | undefined {
+  if (!logo) return undefined;
+  const base = logo.split("/").pop()?.toLowerCase();
+  return base ? LOGO_URLS[base] : undefined;
+}

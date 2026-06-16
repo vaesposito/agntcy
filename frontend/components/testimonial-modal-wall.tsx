@@ -11,34 +11,53 @@ export type Testimonial = {
   company: string;
   quote: string;
   logo?: string;
+  url?: string;
 };
 
 function CompanyLogo({
   logo,
   company,
+  url,
   className,
   wordmarkClassName,
 }: {
   logo?: string;
   company: string;
+  url?: string;
   className: string;
   wordmarkClassName: string;
 }) {
   const [broken, setBroken] = useState(false);
-  if (!logo || broken) {
-    return <span className={wordmarkClassName}>{company}</span>;
-  }
-  return (
-    <span className={className}>
-      <img
-        src={withBase(logo)}
-        alt={`${company} logo`}
-        loading="lazy"
-        onError={() => setBroken(true)}
-        className="h-4 w-auto max-w-full object-contain 3xl:h-6"
-      />
-    </span>
+  const showWordmark = !logo || broken;
+  const containerClass = showWordmark ? wordmarkClassName : className;
+  const content = showWordmark ? (
+    company
+  ) : (
+    <img
+      src={withBase(logo)}
+      alt={`${company} logo`}
+      loading="lazy"
+      onError={() => setBroken(true)}
+      className="h-4 w-auto max-w-full object-contain 3xl:h-6"
+    />
   );
+
+  if (url) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={company}
+        aria-label={`${company} — open website in a new tab`}
+        className={`${containerClass} cursor-pointer transition-all duration-200 hover:scale-[1.04] ${showWordmark ? "hover:border-[#187adc] hover:text-[#fbaf45]" : "opacity-90 hover:opacity-100"}`}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return <span className={containerClass}>{content}</span>;
 }
 
 export function TestimonialModalWall({
@@ -57,28 +76,36 @@ export function TestimonialModalWall({
     >
       <div className="mt-12 columns-1 gap-5 sm:columns-2 lg:columns-3 3xl:mt-16 3xl:gap-7">
         {testimonials.map((t) => (
-          <button
+          <div
             key={`${t.name}-${t.company}`}
-            type="button"
-            onClick={() => setActive(t)}
-            aria-label={`Read the full testimonial from ${t.name}, ${t.title} at ${t.company}`}
-            className="group relative mb-5 block w-full break-inside-avoid cursor-pointer rounded-[20px] border border-[#0d274d] bg-[#00142b] p-6 text-left shadow-[0px_4px_30px_#0d274d] transition-all duration-300 hover:-translate-y-1 hover:border-[#187adc] hover:shadow-[0px_8px_50px_rgba(24,122,220,0.45)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#187adc] focus-visible:ring-offset-2 focus-visible:ring-offset-[#00142b] 3xl:mb-7 3xl:rounded-[28px] 3xl:p-8"
+            className="group relative mb-5 break-inside-avoid rounded-[20px] border border-[#0d274d] bg-[#00142b] p-6 shadow-[0px_4px_30px_#0d274d] transition-all duration-300 hover:-translate-y-1 hover:border-[#187adc] hover:shadow-[0px_8px_50px_rgba(24,122,220,0.45)] 3xl:mb-7 3xl:rounded-[28px] 3xl:p-8"
           >
             <span
               aria-hidden
               className="pointer-events-none absolute inset-0 rounded-[20px] p-px opacity-0 transition-opacity duration-300 [background:linear-gradient(135deg,#187adc,#5fd3ff)] [-webkit-mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] [-webkit-mask-composite:xor] [mask-composite:exclude] group-hover:opacity-100 3xl:rounded-[28px]"
             />
-            <Quote aria-hidden className="h-6 w-6 text-[#fbaf45] 3xl:h-8 3xl:w-8" />
-            <p className="mt-4 line-clamp-6 text-sm leading-relaxed text-[#e8e9ea] 3xl:mt-6 3xl:text-lg">
-              {t.quote}
-            </p>
-            <span className="mt-3 inline-block text-xs font-semibold text-[#187adc] transition-colors duration-200 group-hover:text-[#fbaf45] 3xl:text-base">
-              Read more
-            </span>
+            <button
+              type="button"
+              onClick={() => setActive(t)}
+              aria-label={`Read the full testimonial from ${t.name}, ${t.title} at ${t.company}`}
+              className="block w-full cursor-pointer rounded-[12px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#187adc] focus-visible:ring-offset-2 focus-visible:ring-offset-[#00142b]"
+            >
+              <Quote
+                aria-hidden
+                className="h-6 w-6 text-[#fbaf45] 3xl:h-8 3xl:w-8"
+              />
+              <p className="mt-4 line-clamp-6 text-sm leading-relaxed text-[#e8e9ea] 3xl:mt-6 3xl:text-lg">
+                {t.quote}
+              </p>
+              <span className="mt-3 inline-block text-xs font-semibold text-[#187adc] transition-colors duration-200 group-hover:text-[#fbaf45] 3xl:text-base">
+                Read more
+              </span>
+            </button>
             <div className="mt-5 border-t border-[#0d274d] pt-4 3xl:mt-7 3xl:pt-5">
               <CompanyLogo
                 logo={t.logo}
                 company={t.company}
+                url={t.url}
                 className="inline-flex h-8 max-w-[160px] items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-2.5 3xl:h-11 3xl:max-w-[220px] 3xl:px-3.5"
                 wordmarkClassName="inline-flex h-8 items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-3 text-sm font-semibold tracking-tight text-white 3xl:h-11 3xl:text-lg"
               />
@@ -89,7 +116,7 @@ export function TestimonialModalWall({
                 {t.title}, {t.company}
               </p>
             </div>
-          </button>
+          </div>
         ))}
       </div>
 
@@ -114,6 +141,7 @@ export function TestimonialModalWall({
                 <CompanyLogo
                   logo={active.logo}
                   company={active.company}
+                  url={active.url}
                   className="inline-flex h-10 max-w-[200px] items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-3 3xl:h-14 3xl:max-w-[280px] 3xl:px-4"
                   wordmarkClassName="inline-flex h-10 items-center rounded-md border border-[#0d274d] bg-[#0d274d]/40 px-4 text-base font-semibold tracking-tight text-white 3xl:h-14 3xl:text-xl"
                 />

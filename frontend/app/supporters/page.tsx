@@ -9,7 +9,9 @@ import {
   SupporterLogoWall,
   type Supporter,
 } from "@/components/supporter-logo-wall";
+import { TscLogos } from "@/components/tsc-logos";
 import { withBase } from "@/lib/site";
+import { urlForLogo } from "@/lib/company-urls";
 
 export const metadata: Metadata = {
   title: "Supporters — AGNTCY",
@@ -229,10 +231,10 @@ const TESTIMONIALS: Testimonial[] = [
   },
 ];
 
-const TESTIMONIAL_CARDS: TestimonialCard[] = TESTIMONIALS.map((t) => ({
-  ...t,
-  logo: COMPANY_LOGOS[t.company],
-}));
+const TESTIMONIAL_CARDS: TestimonialCard[] = TESTIMONIALS.map((t) => {
+  const logo = COMPANY_LOGOS[t.company];
+  return { ...t, logo, url: urlForLogo(logo) };
+});
 
 export default function SupportersPage() {
   return (
@@ -300,7 +302,21 @@ export default function SupportersPage() {
 
           <SupporterLogoWall supporters={SUPPORTERS} />
 
-          <section className="mt-20 3xl:mt-28">
+          <section className="mt-20 border-t border-[#0d274d] pt-16 3xl:mt-28 3xl:pt-24">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#fbaf45] 3xl:text-base">
+              Technical Steering Committee
+            </p>
+            <h2 className="mt-4 max-w-4xl text-3xl font-light leading-tight text-[#fbaf45] md:text-4xl lg:text-5xl 3xl:mt-6 3xl:max-w-5xl 3xl:text-6xl">
+              Formative Members
+            </h2>
+            <p className="mt-5 max-w-3xl text-sm leading-relaxed text-white md:text-base lg:text-lg 3xl:mt-7 3xl:max-w-4xl 3xl:text-2xl">
+              The organizations steering AGNTCY as a Series of LF Projects, LLC —
+              alongside the broader community of contributors.
+            </p>
+            <TscLogos />
+          </section>
+
+          <section className="mt-20 border-t border-[#0d274d] pt-16 3xl:mt-28 3xl:pt-24">
             <h2 className="max-w-4xl text-3xl font-light leading-tight text-[#fbaf45] md:text-4xl lg:text-5xl 3xl:max-w-5xl 3xl:text-6xl">
               They say about us
             </h2>
