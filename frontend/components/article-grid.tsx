@@ -3,7 +3,10 @@
 import { useMemo, useState } from "react";
 import { SquareArrowOutUpRight } from "lucide-react";
 
-export type ArticleSource = "Technical Blog" | "Outshift Blog";
+export type ArticleSource =
+  | "Technical Blog"
+  | "Outshift Blog"
+  | "External Articles";
 
 export type Article = {
   title: string;
@@ -15,17 +18,29 @@ export type Article = {
 
 type Filter = "All" | ArticleSource;
 
-const FILTERS: Filter[] = ["All", "Technical Blog", "Outshift Blog"];
+const FILTERS: Filter[] = [
+  "All",
+  "Technical Blog",
+  "Outshift Blog",
+  "External Articles",
+];
 
 const SOURCE_BADGE: Record<ArticleSource, string> = {
-  "Technical Blog":
-    "border-[#187adc] bg-[#187adc]/10 text-[#5fb0f5]",
+  "Technical Blog": "border-[#187adc] bg-[#187adc]/10 text-[#5fb0f5]",
   "Outshift Blog": "border-[#fbaf45] bg-[#fbaf45]/10 text-[#fbaf45]",
+  "External Articles": "border-[#a78bfa] bg-[#a78bfa]/10 text-[#c4b5fd]",
 };
 
 const SOURCE_CTA: Record<ArticleSource, string> = {
   "Technical Blog": "Read on blogs.agntcy.org",
   "Outshift Blog": "Read on Outshift",
+  "External Articles": "Read article",
+};
+
+const SOURCE_FALLBACK_LABEL: Record<ArticleSource, string> = {
+  "Technical Blog": "Technical Blog",
+  "Outshift Blog": "Outshift",
+  "External Articles": "External",
 };
 
 function formatDate(iso?: string): string | null {
@@ -54,16 +69,16 @@ function formatDate(iso?: string): string | null {
 export function ArticleGrid({ articles }: { articles: Article[] }) {
   const [filter, setFilter] = useState<Filter>("All");
 
-  const counts = useMemo(
-    () => ({
+  const counts = useMemo(() => {
+    const base: Record<Filter, number> = {
       All: articles.length,
-      "Technical Blog": articles.filter((a) => a.source === "Technical Blog")
-        .length,
-      "Outshift Blog": articles.filter((a) => a.source === "Outshift Blog")
-        .length,
-    }),
-    [articles],
-  );
+      "Technical Blog": 0,
+      "Outshift Blog": 0,
+      "External Articles": 0,
+    };
+    for (const a of articles) base[a.source] += 1;
+    return base;
+  }, [articles]);
 
   const visible = useMemo(() => {
     const filtered =
@@ -141,9 +156,7 @@ export function ArticleGrid({ articles }: { articles: Article[] }) {
                   </span>
                 ) : (
                   <span className="text-xs text-[#e8e9ea]/40 3xl:text-sm">
-                    {article.source === "Outshift Blog"
-                      ? "Outshift"
-                      : article.source}
+                    {SOURCE_FALLBACK_LABEL[article.source]}
                   </span>
                 )}
               </div>

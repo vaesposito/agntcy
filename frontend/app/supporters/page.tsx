@@ -303,13 +303,11 @@ export default function SupportersPage() {
             </span>
           </Link>
 
-          <div className="mt-8 3xl:mt-10">
-            <SectionTabs tabs={SECTION_TABS} />
-          </div>
+          <SectionTabs tabs={SECTION_TABS} />
 
           <section
             id="supporters"
-            className="scroll-mt-28 3xl:scroll-mt-36"
+            className="scroll-mt-36 3xl:scroll-mt-48"
           >
             <h1 className="mt-10 max-w-4xl text-3xl font-light leading-tight text-[#fbaf45] md:text-4xl lg:text-5xl 3xl:mt-14 3xl:max-w-5xl 3xl:text-6xl">
               Our Supporters
@@ -326,7 +324,7 @@ export default function SupportersPage() {
 
           <section
             id="tsc"
-            className="mt-20 scroll-mt-28 border-t border-[#0d274d] pt-16 3xl:mt-28 3xl:scroll-mt-36 3xl:pt-24"
+            className="mt-20 scroll-mt-36 border-t border-[#0d274d] pt-16 3xl:mt-28 3xl:scroll-mt-48 3xl:pt-24"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#fbaf45] 3xl:text-base">
               Technical Steering Committee
@@ -343,7 +341,7 @@ export default function SupportersPage() {
 
           <section
             id="testimonials"
-            className="mt-20 scroll-mt-28 border-t border-[#0d274d] pt-16 3xl:mt-28 3xl:scroll-mt-36 3xl:pt-24"
+            className="mt-20 scroll-mt-36 border-t border-[#0d274d] pt-16 3xl:mt-28 3xl:scroll-mt-48 3xl:pt-24"
           >
             <h2 className="max-w-4xl text-3xl font-light leading-tight text-[#fbaf45] md:text-4xl lg:text-5xl 3xl:max-w-5xl 3xl:text-6xl">
               They say about us

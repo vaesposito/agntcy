@@ -11,6 +11,21 @@ export function SectionTabs({ tabs }: { tabs: SectionTab[] }) {
   const [activeId, setActiveId] = useState(
     tabs[0]?.href.replace("#", "") ?? "",
   );
+  const [topOffset, setTopOffset] = useState(0);
+
+  useEffect(() => {
+    const header = document.querySelector("header");
+    if (!header) return;
+    const update = () => setTopOffset(header.getBoundingClientRect().height);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(header);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
 
   useEffect(() => {
     const ids = tabs.map((t) => t.href.replace("#", ""));
@@ -31,7 +46,7 @@ export function SectionTabs({ tabs }: { tabs: SectionTab[] }) {
           setActiveId(visible[0].target.id);
         }
       },
-      { rootMargin: "-20% 0px -70% 0px", threshold: 0 },
+      { rootMargin: "-25% 0px -65% 0px", threshold: 0 },
     );
 
     sections.forEach((s) => observer.observe(s));
@@ -39,29 +54,34 @@ export function SectionTabs({ tabs }: { tabs: SectionTab[] }) {
   }, [tabs]);
 
   return (
-    <nav
-      aria-label="Jump to section"
-      className="inline-flex items-center rounded-full border border-[#0d274d] bg-[#0d274d]/30 p-1 3xl:p-1.5"
+    <div
+      style={{ top: topOffset }}
+      className="sticky z-20 mt-8 border-b border-[#0d274d] bg-[#00142b]/95 py-3 backdrop-blur supports-[backdrop-filter]:bg-[#00142b]/80 3xl:mt-10 3xl:py-4"
     >
-      {tabs.map((tab) => {
-        const id = tab.href.replace("#", "");
-        const isActive = id === activeId;
-        return (
-          <a
-            key={tab.href}
-            href={tab.href}
-            aria-current={isActive ? "true" : undefined}
-            onClick={() => setActiveId(id)}
-            className={`cursor-pointer whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-200 md:px-4 md:text-sm 3xl:px-5 3xl:py-2 3xl:text-lg ${
-              isActive
-                ? "bg-[#187adc] text-white shadow-[0px_2px_12px_rgba(24,122,220,0.45)]"
-                : "text-white/70 hover:text-[#fbaf45]"
-            }`}
-          >
-            {tab.label}
-          </a>
-        );
-      })}
-    </nav>
+      <nav
+        aria-label="Jump to section"
+        className="inline-flex items-center rounded-full border border-[#0d274d] bg-[#0d274d]/30 p-1 3xl:p-1.5"
+      >
+        {tabs.map((tab) => {
+          const id = tab.href.replace("#", "");
+          const isActive = id === activeId;
+          return (
+            <a
+              key={tab.href}
+              href={tab.href}
+              aria-current={isActive ? "true" : undefined}
+              onClick={() => setActiveId(id)}
+              className={`cursor-pointer whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium transition-colors duration-200 md:px-4 md:text-sm 3xl:px-5 3xl:py-2 3xl:text-lg ${
+                isActive
+                  ? "bg-[#187adc] text-white shadow-[0px_2px_12px_rgba(24,122,220,0.45)]"
+                  : "text-white/70 hover:text-[#fbaf45]"
+              }`}
+            >
+              {tab.label}
+            </a>
+          );
+        })}
+      </nav>
+    </div>
   );
 }
