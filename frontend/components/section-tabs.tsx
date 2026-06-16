@@ -56,7 +56,7 @@ export function SectionTabs({ tabs }: { tabs: SectionTab[] }) {
   return (
     <div
       style={{ top: topOffset }}
-      className="sticky z-20 mt-8 border-b border-[#0d274d] bg-[#00142b]/95 py-3 backdrop-blur supports-[backdrop-filter]:bg-[#00142b]/80 3xl:mt-10 3xl:py-4"
+      className="sticky z-20 mt-8 -mx-8 border-b border-[#0d274d] bg-[#00142b] px-8 py-4 md:-mx-[90px] md:px-[90px] lg:-ml-[200px] lg:-mr-[150px] lg:pl-[200px] lg:pr-[150px] 3xl:-ml-[260px] 3xl:-mr-[200px] 3xl:mt-10 3xl:py-5 3xl:pl-[260px] 3xl:pr-[200px]"
     >
       <nav
         aria-label="Jump to section"

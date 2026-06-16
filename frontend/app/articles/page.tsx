@@ -171,6 +171,7 @@ const ARTICLES: Article[] = [
     source: "External Articles",
     title: "Why We Need a New Internet for AI",
     href: "https://partners.wsj.com/cisco/building-the-internet-of-agents/why-we-need-a-new-internet-for-ai",
+    date: "2025-03-09",
     excerpt:
       "WSJ for Business: Vijoy Pandey on reshaping the internet to support AI-native, agent-based systems.",
   },
@@ -179,6 +180,7 @@ const ARTICLES: Article[] = [
     title:
       "A standard, open framework for building AI agents is coming from Cisco, LangChain and Galileo",
     href: "https://venturebeat.com/ai/a-standard-open-framework-for-building-ai-agents-is-coming-from-cisco-langchain-and-galileo/",
+    date: "2025-03-06",
     excerpt:
       "VentureBeat: a new open-source stack for agentic AI — built for devs, backed by experts.",
   },
@@ -186,6 +188,7 @@ const ARTICLES: Article[] = [
     source: "External Articles",
     title: "AGNTCY: Building the Future of Multi-Agentic Systems",
     href: "https://www.galileo.ai/blog/agntcy-open-collective-multi-agent-standardization",
+    date: "2025-03-05",
     excerpt:
       "Galileo: why Galileo joined AGNTCY to help standardize agentic AI for developers.",
   },
