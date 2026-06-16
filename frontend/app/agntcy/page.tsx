@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SquareArrowOutUpRight } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "AGNTCY — Building the Internet of Agents",
@@ -137,8 +138,16 @@ export default function AgntcyPage() {
           {CARDS.map((card) => (
             <article
               key={card.title}
-              className="rounded-[20px] border border-[#0d274d] bg-[#00142b] p-6 text-center shadow-[0px_4px_30px_#0d274d]"
+              className="group relative cursor-pointer rounded-[20px] border border-[#0d274d] bg-[#00142b] p-6 text-center shadow-[0px_4px_30px_#0d274d] transition-shadow duration-300 hover:shadow-[0px_8px_50px_rgba(24,122,220,0.45)]"
             >
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 rounded-[20px] p-px opacity-0 transition-opacity duration-300 [background:linear-gradient(135deg,#187adc,#5fd3ff)] [-webkit-mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] [-webkit-mask-composite:xor] [mask-composite:exclude] group-hover:opacity-100"
+              />
+              <SquareArrowOutUpRight
+                aria-hidden
+                className="absolute right-4 top-4 h-4 w-4 text-[#e8e9ea] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+              />
               <div className="flex justify-center">
                 <img
                   src={card.icon}
