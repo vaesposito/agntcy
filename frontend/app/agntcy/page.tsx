@@ -11,11 +11,14 @@ export const metadata: Metadata = {
 };
 
 const NAV_LINKS = [
-  { label: "Documentation", href: "#" },
+  { label: "Documentation", href: "https://docs.agntcy.org/" },
   { label: "Articles", href: "/articles" },
   { label: "Supporters", href: "/supporters" },
-  { label: "YouTube", href: "#" },
-  { label: "Github", href: "https://github.com" },
+  {
+    label: "YouTube",
+    href: "https://www.youtube.com/playlist?list=PL49BrgsjXg5qVeRVqlX9O74W02q3c8fow",
+  },
+  { label: "Github", href: "https://github.com/agntcy" },
 ];
 
 const CARDS = [
@@ -64,15 +67,21 @@ export default function AgntcyPage() {
 
       <header className="flex justify-end px-8 py-6 md:px-[90px] md:py-8 lg:pl-[200px] lg:pr-[150px] 3xl:pl-[260px] 3xl:pr-[200px] 3xl:py-12">
         <nav className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2 text-sm text-white md:gap-x-8 md:text-base 3xl:gap-x-10 3xl:text-xl">
-          {NAV_LINKS.map((link) => (
-            <a
-              key={link.label}
-              href={link.href.startsWith("/") ? withBase(link.href) : link.href}
-              className="cursor-pointer bg-[linear-gradient(#fbaf45,#fbaf45)] bg-[length:0%_2px] bg-[position:0_100%] bg-no-repeat pb-1 text-white transition-[color,background-size] duration-200 hover:bg-[length:100%_2px] hover:text-[#fbaf45]"
-            >
-              {link.label}
-            </a>
-          ))}
+          {NAV_LINKS.map((link) => {
+            const internal = link.href.startsWith("/");
+            return (
+              <a
+                key={link.label}
+                href={internal ? withBase(link.href) : link.href}
+                {...(internal
+                  ? {}
+                  : { target: "_blank", rel: "noopener noreferrer" })}
+                className="cursor-pointer bg-[linear-gradient(#fbaf45,#fbaf45)] bg-[length:0%_2px] bg-[position:0_100%] bg-no-repeat pb-1 text-white transition-[color,background-size] duration-200 hover:bg-[length:100%_2px] hover:text-[#fbaf45]"
+              >
+                {link.label}
+              </a>
+            );
+          })}
         </nav>
       </header>
 
@@ -109,7 +118,9 @@ export default function AgntcyPage() {
 
         <div className="mt-7 flex flex-wrap gap-3 3xl:mt-10 3xl:gap-4">
           <a
-            href="https://github.com"
+            href="https://github.com/agntcy"
+            target="_blank"
+            rel="noopener noreferrer"
             className="group inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#187adc] bg-[#00142b] px-4 py-2 text-xs text-[#e8e9ea] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#3b91e6] hover:bg-[#187adc]/10 hover:shadow-[0px_8px_24px_rgba(24,122,220,0.35)] md:px-5 md:py-2.5 md:text-sm 3xl:gap-2 3xl:px-7 3xl:py-3.5 3xl:text-lg"
           >
             Github
@@ -123,7 +134,25 @@ export default function AgntcyPage() {
             />
           </a>
           <a
-            href="#"
+            href="https://join.slack.com/t/agntcy/shared_invite/zt-3hb4p7bo0-5H2otGjxGt9OQ1g5jzK_GQ"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-[#187adc] bg-[#00142b] px-4 py-2 text-xs text-[#e8e9ea] transition-all duration-200 hover:-translate-y-0.5 hover:border-[#3b91e6] hover:bg-[#187adc]/10 hover:shadow-[0px_8px_24px_rgba(24,122,220,0.35)] md:px-5 md:py-2.5 md:text-sm 3xl:gap-2 3xl:px-7 3xl:py-3.5 3xl:text-lg"
+          >
+            Join us on Slack
+            <img
+              src={withBase("/agntcy/slack.svg")}
+              width={20}
+              height={20}
+              alt=""
+              aria-hidden
+              className="h-3.5 w-3.5 transition-transform duration-200 group-hover:scale-110 md:h-4 md:w-4 3xl:h-5 3xl:w-5"
+            />
+          </a>
+          <a
+            href="https://docs.agntcy.org/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="group inline-flex cursor-pointer items-center gap-1.5 rounded-full bg-[#187adc] px-4 py-2 text-xs text-[#e8e9ea] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#2b8ae8] hover:shadow-[0px_8px_24px_rgba(24,122,220,0.5)] md:px-5 md:py-2.5 md:text-sm 3xl:gap-2 3xl:px-7 3xl:py-3.5 3xl:text-lg"
           >
             Learn more

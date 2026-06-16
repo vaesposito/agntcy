@@ -20,11 +20,14 @@ export const metadata: Metadata = {
 };
 
 const NAV_LINKS = [
-  { label: "Documentation", href: "#" },
+  { label: "Documentation", href: "https://docs.agntcy.org/" },
   { label: "Articles", href: "/articles" },
   { label: "Supporters", href: "/supporters" },
-  { label: "YouTube", href: "#" },
-  { label: "Github", href: "https://github.com" },
+  {
+    label: "YouTube",
+    href: "https://www.youtube.com/playlist?list=PL49BrgsjXg5qVeRVqlX9O74W02q3c8fow",
+  },
+  { label: "Github", href: "https://github.com/agntcy" },
 ];
 
 type Testimonial = {
@@ -264,6 +267,8 @@ export default function SupportersPage() {
                 <a
                   key={link.label}
                   href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="cursor-pointer bg-[linear-gradient(#fbaf45,#fbaf45)] bg-[length:0%_2px] bg-[position:0_100%] bg-no-repeat pb-1 text-white transition-[color,background-size] duration-200 hover:bg-[length:100%_2px] hover:text-[#fbaf45]"
                 >
                   {link.label}

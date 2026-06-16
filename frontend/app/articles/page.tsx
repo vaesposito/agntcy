@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SquareArrowOutUpRight, BookOpen } from "lucide-react";
 import { AgntcyFooter } from "@/components/agntcy-footer";
 import { ArticleGrid, type Article } from "@/components/article-grid";
 import { withBase } from "@/lib/site";
@@ -12,11 +11,14 @@ export const metadata: Metadata = {
 };
 
 const NAV_LINKS = [
-  { label: "Documentation", href: "#" },
+  { label: "Documentation", href: "https://docs.agntcy.org/" },
   { label: "Articles", href: "/articles" },
   { label: "Supporters", href: "/supporters" },
-  { label: "YouTube", href: "#" },
-  { label: "Github", href: "https://github.com" },
+  {
+    label: "YouTube",
+    href: "https://www.youtube.com/playlist?list=PL49BrgsjXg5qVeRVqlX9O74W02q3c8fow",
+  },
+  { label: "Github", href: "https://github.com/agntcy" },
 ];
 
 const ARTICLES: Article[] = [
@@ -187,6 +189,8 @@ export default function ArticlesPage() {
                 <a
                   key={link.label}
                   href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="cursor-pointer bg-[linear-gradient(#fbaf45,#fbaf45)] bg-[length:0%_2px] bg-[position:0_100%] bg-no-repeat pb-1 text-white transition-[color,background-size] duration-200 hover:bg-[length:100%_2px] hover:text-[#fbaf45]"
                 >
                   {link.label}
@@ -222,40 +226,6 @@ export default function ArticlesPage() {
             AGNTCY and the Internet of Agents community — from the engineering
             Technical Blog and the Outshift Blog, in one place.
           </p>
-
-          <a
-            href="https://blogs.agntcy.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative mt-12 block cursor-pointer rounded-[20px] border border-[#0d274d] bg-[#00142b] p-7 shadow-[0px_4px_30px_#0d274d] transition-all duration-300 hover:-translate-y-1 hover:border-[#187adc] hover:shadow-[0px_8px_50px_rgba(24,122,220,0.45)] 3xl:mt-16 3xl:rounded-[28px] 3xl:p-10"
-          >
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 rounded-[20px] p-px opacity-0 transition-opacity duration-300 [background:linear-gradient(135deg,#187adc,#5fd3ff)] [-webkit-mask:linear-gradient(#fff_0_0)_content-box,linear-gradient(#fff_0_0)] [-webkit-mask-composite:xor] [mask-composite:exclude] group-hover:opacity-100 3xl:rounded-[28px]"
-            />
-            <SquareArrowOutUpRight
-              aria-hidden
-              className="absolute right-6 top-6 h-5 w-5 text-[#e8e9ea] opacity-0 transition-opacity duration-300 group-hover:opacity-100 3xl:right-8 3xl:top-8 3xl:h-6 3xl:w-6"
-            />
-            <div className="flex items-center gap-4 3xl:gap-6">
-              <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] border border-[#187adc] bg-[#187adc]/10 text-[#fbaf45] 3xl:h-16 3xl:w-16 3xl:rounded-[18px]">
-                <BookOpen aria-hidden className="h-6 w-6 3xl:h-8 3xl:w-8" />
-              </span>
-              <div>
-                <h2 className="text-xl font-bold text-[#e8e9ea] md:text-2xl 3xl:text-3xl">
-                  Technical Blog
-                </h2>
-                <p className="mt-1.5 text-sm leading-relaxed text-[#e8e9ea] md:text-base 3xl:mt-2.5 3xl:text-xl">
-                  In-depth engineering posts on the AGNTCY stack — discovery,
-                  identity, messaging, and observability for the Internet of
-                  Agents.
-                </p>
-              </div>
-            </div>
-            <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[#187adc] transition-colors duration-200 group-hover:text-[#fbaf45] 3xl:mt-7 3xl:gap-2 3xl:text-lg">
-              blogs.agntcy.org
-            </span>
-          </a>
 
           <section className="mt-16 3xl:mt-24">
             <h2 className="text-xl font-bold text-[#e8e9ea] md:text-2xl 3xl:text-3xl">
